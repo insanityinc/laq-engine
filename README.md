@@ -1,1 +1,1 @@
-# Linear Algebra DBMS
+# Typed Linear Algebra DBMS

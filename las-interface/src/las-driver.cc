@@ -33,4 +33,14 @@ driver::error(const std::string& m) {
   std::cerr << m << std::endl;
 }
 
+void
+driver::addvar(const std::string& var) {
+  variables.insert(var);
+}
+
+bool
+driver::varexists(const std::string& var) {
+  return (variables.find(var) != variables.end());
+}
+
 }  // namespace las

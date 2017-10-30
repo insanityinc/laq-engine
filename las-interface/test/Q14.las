@@ -1,5 +1,5 @@
 /*
- * Linear Algebra Query 14
+ * Linear Algebra Script 14
  */
 
 A = filter( match( p.type , "PROMO" ) )			//1 <-- #p

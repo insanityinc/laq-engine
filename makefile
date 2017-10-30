@@ -37,6 +37,9 @@ linter:
 	$(LINTER) $(LAS_FOLDER)/src/las-driver.cc
 	$(LINTER) $(LAS_FOLDER)/include/las-driver.hh
 
+test: $(LAS_FOLDER)/bin/las
+	$(LAS_FOLDER)/bin/las $(LAS_FOLDER)/test/Q14.las
+
 .PHONY: all clean
 	
 	

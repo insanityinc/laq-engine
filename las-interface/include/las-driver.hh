@@ -36,21 +36,28 @@ class driver {
   std::string file;
   bool trace_parsing;
 
-  // Check variable definition
-  void add_variable();
-  void variable_exists();
-
-  //
-  void insertStatement();
-
   // Error handling.
   void error(const yy::location& l, const std::string& m);
   void error(const std::string& m);
 
+  // Check variable definition
+  void addvar(const std::string& var);
+  bool varexists(const std::string& var);
+
+  // Adds a new statement to the list
+  void insertStatement();
+
  private:
   // Staments of a LA script
   class statement {
+   public:
     statement();
+
+   private:
+    std::string lvar;
+    std::string operation;
+    std::vector<std::string> rvars;
+    std::string expression;
   };  // class statement
 
   // Assigned variables of a LA script

@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#include "las-driver.hh"
-#include "las-parser.hh"
+#include "laq-driver.hh"
+#include "laq-parser.hh"
 
-namespace las {
+namespace laq {
 
 driver::driver() : trace_scanning(false), trace_parsing(false) {
 }
@@ -16,7 +16,7 @@ int
 driver::parse(const std::string &f) {
   file = f;
   scan_begin();
-  yy::las_parser parser(*this);
+  yy::laq_parser parser(*this);
   parser.set_debug_level(trace_parsing);
   int res = parser.parse();
   scan_end();
@@ -43,4 +43,4 @@ driver::varexists(const std::string& var) {
   return (variables.find(var) != variables.end());
 }
 
-}  // namespace las
+}  // namespace laq

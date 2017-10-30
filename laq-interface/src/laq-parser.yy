@@ -4,16 +4,16 @@
 %skeleton "lalr1.cc" /* -*- C++ -*- */
 %require "2.6.90.8-d4fe"
 %defines
-%define parser_class_name { las_parser }
+%define parser_class_name { laq_parser }
 
 %code requires {
 # include <string>
-namespace las { class driver; }
+namespace laq { class driver; }
 }
 
 // The parsing context.
-%parse-param  { las::driver& driver }
-%lex-param    { las::driver& driver }
+%parse-param  { laq::driver& driver }
+%lex-param    { laq::driver& driver }
 
 %locations
 %initial-action
@@ -31,7 +31,7 @@ namespace las { class driver; }
 }
 
 %code {
-# include "las-driver.hh"
+# include "laq-driver.hh"
 }
 
 %token END 0 "end of file"
@@ -64,12 +64,12 @@ namespace las { class driver; }
 %destructor { delete $$; } <sval>
 
 %%
-%start lascript;
+%start laquery;
 
-lascript
+laquery
   : "end of file"                                         {  /*EMPTY*/ }
   | statement                                             {  }
-  | lascript statement                                    {  }
+  | laquery statement                                     {  }
   ;
 
 statement
@@ -278,7 +278,7 @@ data_type
 %%
 
 void
-yy::las_parser::error(const yy::las_parser::location_type& l,
+yy::laq_parser::error(const yy::laq_parser::location_type& l,
          const std::string& m)
 {
   driver.error(l, m);

@@ -3,42 +3,42 @@ CXX = g++-7.2
 CXXFLAGS = -O2 -std=c++14 -pedantic -Wall -Wextra -Wshadow -Wconversion -Werror
 
 
-LAS_FOLDER = las-interface
+LAQ_FOLDER = laq-interface
 LINTER = lib/cpplint/cpplint.py
 
-all: las
+all: laq
 
 clean:
-	rm -fr $(LAS_FOLDER)/build
+	rm -fr $(LAQ_FOLDER)/build
 
 delete: clean
-	rm -fr $(LAS_FOLDER)/bin
+	rm -fr $(LAQ_FOLDER)/bin
 
-las: dir las-bison las-flex
+laq: dir laq-bison laq-flex
 	$(CXX) $(CXXFLAGS) \
-		$(LAS_FOLDER)/build/las-parser.cc \
-		$(LAS_FOLDER)/build/lex.yy.cc \
-		$(LAS_FOLDER)/src/las-driver.cc \
-		$(LAS_FOLDER)/test/las.cc \
-		-I $(LAS_FOLDER)/include \
-		-I $(LAS_FOLDER)/build \
-		-o $(LAS_FOLDER)/bin/$@ -lfl
+		$(LAQ_FOLDER)/build/laq-parser.cc \
+		$(LAQ_FOLDER)/build/lex.yy.cc \
+		$(LAQ_FOLDER)/src/laq-driver.cc \
+		$(LAQ_FOLDER)/test/laq.cc \
+		-I $(LAQ_FOLDER)/include \
+		-I $(LAQ_FOLDER)/build \
+		-o $(LAQ_FOLDER)/bin/$@ -lfl
 
 dir:
-	mkdir -p $(LAS_FOLDER)/build $(LAS_FOLDER)/bin
+	mkdir -p $(LAQ_FOLDER)/build $(LAQ_FOLDER)/bin
 
-las-bison: $(LAS_FOLDER)/src/las-parser.yy
-	bison -o $(LAS_FOLDER)/build/las-parser.cc -d $<
+laq-bison: $(LAQ_FOLDER)/src/laq-parser.yy
+	bison -o $(LAQ_FOLDER)/build/laq-parser.cc -d $<
 
-las-flex: $(LAS_FOLDER)/src/las-scanner.ll
-	flex -o $(LAS_FOLDER)/build/lex.yy.cc $<
+laq-flex: $(LAQ_FOLDER)/src/laq-scanner.ll
+	flex -o $(LAQ_FOLDER)/build/lex.yy.cc $<
 
 linter:
-	$(LINTER) $(LAS_FOLDER)/src/las-driver.cc
-	$(LINTER) $(LAS_FOLDER)/include/las-driver.hh
+	$(LINTER) $(LAQ_FOLDER)/src/laq-driver.cc
+	$(LINTER) $(LAQ_FOLDER)/include/laq-driver.hh
 
-test: $(LAS_FOLDER)/bin/las
-	$(LAS_FOLDER)/bin/las $(LAS_FOLDER)/test/Q14.las
+test: $(LAQ_FOLDER)/bin/laq
+	$(LAQ_FOLDER)/bin/laq $(LAQ_FOLDER)/test/Q14.laq
 
 .PHONY: all clean
 	

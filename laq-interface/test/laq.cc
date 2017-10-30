@@ -2,11 +2,11 @@
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
 #include <iostream>
-#include "las-driver.hh"
+#include "laq-driver.hh"
 
 int
 main(int argc, char *argv[]) {
-  las::driver driver;
+  laq::driver driver;
   for (int i = 1; i < argc; ++i)
   {
     if (argv[i] == std::string ("-p"))

@@ -6,8 +6,8 @@
 #include <cerrno>
 #include <climits>
 #include <string>
-#include "las-driver.hh"
-#include "las-parser.hh"
+#include "laq-driver.hh"
+#include "laq-parser.hh"
 
 /* Work around an incompatibility in flex (at least versions
    2.5.31 through 2.5.33): it generates code that does
@@ -70,7 +70,7 @@ not                     ([nN][oO][tT]|!)
 %%
 %{
   yylloc->step ();
-  typedef yy::las_parser::token token;
+  typedef yy::laq_parser::token token;
   void toLower(std::string& str);
 %}
 
@@ -80,7 +80,7 @@ not                     ([nN][oO][tT]|!)
                             }
 <INITIAL>"//".+             { }
 <INITIAL>"/*"               { BEGIN MLCOMMENT; }
-<INITIAL>{symbols}          { return yy::las_parser::token_type( yytext[0] ); }
+<INITIAL>{symbols}          { return yy::laq_parser::token_type( yytext[0] ); }
 
 <INITIAL>{filter}           { return token::FILTER; }
 <INITIAL>{map}              { return token::MAP; }
@@ -144,7 +144,7 @@ not                     ([nN][oO][tT]|!)
                               toLower( *(yylval->sval) );
                               return token::IDENTIFIER;
                             }
-<REGEXPRESSION>{symbols}    { return yy::las_parser::token_type( yytext[0] ); }
+<REGEXPRESSION>{symbols}    { return yy::laq_parser::token_type( yytext[0] ); }
 <REGEXPRESSION>{string}     { yylval->sval = new std::string( yytext );
                               BEGIN INITIAL;
                               return token::REGEXP;
@@ -155,7 +155,7 @@ not                     ([nN][oO][tT]|!)
 
 
 void
-las::driver::scan_begin ()
+laq::driver::scan_begin ()
 {
   yy_flex_debug = trace_scanning;
   if(file.empty() || file == "-")
@@ -168,7 +168,7 @@ las::driver::scan_begin ()
 }
 
 void
-las::driver::scan_end ()
+laq::driver::scan_end ()
 {
   fclose (yyin);
 }

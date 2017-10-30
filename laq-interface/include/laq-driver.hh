@@ -1,26 +1,26 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#ifndef LAS_INTERFACE_INCLUDE_LAS_DRIVER_HH_
-#define LAS_INTERFACE_INCLUDE_LAS_DRIVER_HH_
+#ifndef LAQ_INTERFACE_INCLUDE_LAQ_DRIVER_HH_
+#define LAQ_INTERFACE_INCLUDE_LAQ_DRIVER_HH_
 #include <set>
 #include <string>
 #include <vector>
-#include "las-parser.hh"
+#include "laq-parser.hh"
 
 // Tell Flex the lexer's prototype ...
 #define YY_DECL                                 \
-  yy::las_parser::token_type                    \
-  yylex(yy::las_parser::semantic_type* yylval,  \
-        yy::las_parser::location_type* yylloc,  \
-        las::driver& driver)
+  yy::laq_parser::token_type                    \
+  yylex(yy::laq_parser::semantic_type* yylval,  \
+        yy::laq_parser::location_type* yylloc,  \
+        laq::driver& driver)
 // ... and declare it for the parser's sake.
 YY_DECL;
 
-namespace las {
+namespace laq {
 
 // Conducting the whole scanning and parsing
-// of LAS (Linear Algebra Scripting language)
+// of LAQ (Linear Algebra Query language)
 class driver {
  public:
   driver();
@@ -64,11 +64,11 @@ class driver {
   std::set<std::string> variables;
 
   // List of statements
-  std::vector<statement> lascript;
+  std::vector<statement> laquery;
 
   // Tree of statements
   // util::
 };  // class driver
-}  // namespace las
+}  // namespace laq
 
-#endif  // LAS_INTERFACE_INCLUDE_LAS_DRIVER_HH_
+#endif  // LAQ_INTERFACE_INCLUDE_LAQ_DRIVER_HH_

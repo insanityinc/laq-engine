@@ -14,10 +14,11 @@ clean:
 delete: clean
 	rm -fr $(LAQ_FOLDER)/bin
 
-laq: dir laq-bison laq-flex
+laq: dir bison flex
 	$(CXX) $(CXXFLAGS) \
 		$(LAQ_FOLDER)/build/laq-parser.cc \
 		$(LAQ_FOLDER)/build/lex.yy.cc \
+		$(LAQ_FOLDER)/src/laq-statement.cc \
 		$(LAQ_FOLDER)/src/laq-driver.cc \
 		$(LAQ_FOLDER)/test/laq.cc \
 		-I $(LAQ_FOLDER)/include \
@@ -27,14 +28,16 @@ laq: dir laq-bison laq-flex
 dir:
 	mkdir -p $(LAQ_FOLDER)/build $(LAQ_FOLDER)/bin
 
-laq-bison: $(LAQ_FOLDER)/src/laq-parser.yy
+bison: $(LAQ_FOLDER)/src/laq-parser.yy
 	bison -o $(LAQ_FOLDER)/build/laq-parser.cc -d $<
 
-laq-flex: $(LAQ_FOLDER)/src/laq-scanner.ll
+flex: $(LAQ_FOLDER)/src/laq-scanner.ll
 	flex -o $(LAQ_FOLDER)/build/lex.yy.cc $<
 
 linter:
 	$(LINTER) $(LAQ_FOLDER)/src/laq-driver.cc
+	$(LINTER) $(LAQ_FOLDER)/src/laq-statement.cc
+	$(LINTER) $(LAQ_FOLDER)/src/laq-statement.hh
 	$(LINTER) $(LAQ_FOLDER)/include/laq-driver.hh
 
 test: $(LAQ_FOLDER)/bin/laq
@@ -47,4 +50,4 @@ test: $(LAQ_FOLDER)/bin/laq
 #	gcc -o $@ $^
 #$@ = a
 #$< = b
-#$^ = b c 
+#$^ = b c

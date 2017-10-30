@@ -74,29 +74,36 @@ laquery
 
 statement
   : IDENTIFIER '=' product '(' ident ',' ident ')'        { std::cout<<*$1+"="+*$3+"("+*$5+","+*$7+")"<<std::endl;
-                                                            driver.addvar(*$1);
+                                                            driver.add_var(*$1);
+                                                            driver.insert_statement(*$1, *$3, std::vector<std::string> {*$5, *$7});
                                                             delete $1;
+                                                            delete $3;
+                                                            delete $5;
+                                                            delete $7;
                                                           }
   | IDENTIFIER '=' bang '(' ident ')'                     { std::cout<<*$1+"="+*$3+"("+*$5+")"<<std::endl;
-                                                            driver.addvar(*$1);
+                                                            driver.add_var(*$1);
                                                             delete $1;
                                                           }
   | IDENTIFIER '=' FILTER '(' expression ')'              { std::cout<<*$1+"=filter("+*$5+")"<<std::endl;
-                                                            driver.addvar(*$1);
+                                                            driver.add_var(*$1);
+                                                            std::vector<std::string> expvars = driver.clear_exp_vars();
+                                                            driver.insert_statement(*$1, "filter", expvars, *$5);
                                                             delete $1;
+                                                            delete $5;
                                                           }
   | IDENTIFIER '=' MAP '(' inclusive_or_expression ')'    { std::cout<<*$1+"=map("+*$5+")"<<std::endl;
-                                                            driver.addvar(*$1);
+                                                            driver.add_var(*$1);
                                                             delete $1;
                                                           }
   ;
 
 ident
-  : IDENTIFIER                                            { if(!driver.varexists(*$1))
+  : IDENTIFIER                                            { if(!driver.var_exists(*$1))
                                                               driver.error("Undeclared variable " + *$1);
                                                             $$ = $1;
                                                           }
-  | IDENTIFIER '.' IDENTIFIER                             { $$ = new std::string(*$1 + "." + *$3);
+  | IDENTIFIER '.' IDENTIFIER                             { $$ = new std::string(*$1 + "__" + *$3);
                                                             delete $1;
                                                             delete $3;
                                                           }
@@ -247,7 +254,9 @@ primary_expression
                                                             delete $2;
                                                           }
   | function                                              { $$ = $1; }
-  | ident                                                 { $$ = $1; }
+  | ident                                                 { driver.add_exp_var(*$1);
+                                                            $$ = $1;
+                                                          }
   | data_type                                             { $$ = $1; }
   ;
 

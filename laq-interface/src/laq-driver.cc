@@ -3,6 +3,7 @@
  */
 #include "laq-driver.hh"
 #include "laq-parser.hh"
+#include "laq-statement.hh"
 
 namespace laq {
 
@@ -34,13 +35,37 @@ driver::error(const std::string& m) {
 }
 
 void
-driver::addvar(const std::string& var) {
+driver::add_var(const std::string& var) {
   variables.insert(var);
 }
 
 bool
-driver::varexists(const std::string& var) {
+driver::var_exists(const std::string& var) {
   return (variables.find(var) != variables.end());
 }
+
+int
+driver::insert_statement(const std::string& lvar,
+                         const std::string& op,
+                         const std::vector<std::string>& rvars,
+                         const std::string& expr) {
+  if (rvars.empty() && expr.empty())
+    return 0;
+  laquery.push_back(driver::statement(lvar, op, rvars, expr));
+  return 1;
+}
+
+void
+driver::add_exp_var(const std::string& var) {
+  expvars.push_back(var);
+}
+
+std::vector<std::string>
+driver::clear_exp_vars() {
+  std::vector<std::string> tmp = expvars;
+  expvars.clear();
+  return tmp;
+}
+
 
 }  // namespace laq

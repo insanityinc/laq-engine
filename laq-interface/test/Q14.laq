@@ -4,8 +4,8 @@
 
 A = filter( match( p.type , "PROMO" ) )			//1 <-- #p
 B = dot( A, l.partkey )							//1 <-- #l
-C = filter( l.shipdate >= '' )					//1 <-- #l
-D = filter( l.shipdate < '' )					//1 <-- #l
+C = filter( l.shipdate >= "" )					//1 <-- #l
+D = filter( l.shipdate < "" )					//1 <-- #l
 E = hadamard( B, C )							//1 <-- #l
 F = hadamard( E, D )							//1 <-- #l
 G = map( l.extendedprice*(1-l.discount) )		//1 <-- #l

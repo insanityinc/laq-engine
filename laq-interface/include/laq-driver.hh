@@ -14,7 +14,7 @@
   yylex(yy::laq_parser::semantic_type* yylval,  \
         yy::laq_parser::location_type* yylloc,  \
         laq::driver& driver)
-// ... and declare it for the parser's sake.
+// ... and declare it for the parser's sake
 YY_DECL;
 
 namespace laq {
@@ -26,42 +26,44 @@ class driver {
   driver();
   virtual ~driver();
 
-  // Handling the scanner.
+  // Handling the scanner
   void scan_begin();
   void scan_end();
   bool trace_scanning;
 
-  // Run the parser. Return 0 on success.
+  // Run the parser. Return 0 on success
   int parse(const std::string& f);
   std::string file;
   bool trace_parsing;
 
-  // Error handling.
+  // Error handling
   void error(const yy::location& l, const std::string& m);
   void error(const std::string& m);
 
   // Check variable definition
-  void addvar(const std::string& var);
-  bool varexists(const std::string& var);
+  void add_var(const std::string& var);
+  bool var_exists(const std::string& var);
 
-  // Adds a new statement to the list
-  void insertStatement();
+  // Inserts a new statement in the list representing the query
+  int insert_statement(const std::string& lvar,
+                       const std::string& op,
+                       const std::vector<std::string>& rvars = {},
+                       const std::string& expr = "");
+
+  // Add variable contained in any expression
+  void add_exp_var(const std::string& var);
+  // Get variables of current expression and clear the temporary storage
+  std::vector<std::string> clear_exp_vars();
 
  private:
   // Staments of a LA script
-  class statement {
-   public:
-    statement();
-
-   private:
-    std::string lvar;
-    std::string operation;
-    std::vector<std::string> rvars;
-    std::string expression;
-  };  // class statement
+  class statement;
 
   // Assigned variables of a LA script
   std::set<std::string> variables;
+
+  // Temporarily stores the list of variables inside expressions
+  std::vector<std::string> expvars;
 
   // List of statements
   std::vector<statement> laquery;

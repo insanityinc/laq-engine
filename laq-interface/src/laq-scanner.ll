@@ -44,7 +44,7 @@ exp                     [eE][xX][pP]
 sqrt                    [sS][qQ][rR][tT]
 match                   [mM][aA][tT][cC][hH]
 
-identifier              [a-zA-Z][a-zA-Z0-9_]*
+identifier              [a-zA-Z]([a-zA-Z0-9]+[_]?)*
 string                  [\"'][^\"'\\]*(\\.[^\"'\\]*)*[\"']
 int                     [0-9]+
 float                   ([0-9]*\.[0-9]+|[0-9]+\.[0.9]*)

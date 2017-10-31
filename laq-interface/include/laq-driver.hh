@@ -58,6 +58,7 @@ class driver {
  private:
   // Staments of a LA script
   class statement;
+  class parsing_tree;
 
   // Assigned variables of a LA script
   std::set<std::string> variables;

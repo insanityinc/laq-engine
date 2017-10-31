@@ -83,18 +83,28 @@ statement
                                                           }
   | IDENTIFIER '=' bang '(' ident ')'                     { std::cout<<*$1+"="+*$3+"("+*$5+")"<<std::endl;
                                                             driver.add_var(*$1);
+                                                            driver.insert_statement(*$1, *$3, std::vector<std::string> {*$5});
                                                             delete $1;
+                                                            delete $3;
+                                                            delete $5;
                                                           }
   | IDENTIFIER '=' FILTER '(' expression ')'              { std::cout<<*$1+"=filter("+*$5+")"<<std::endl;
                                                             driver.add_var(*$1);
                                                             std::vector<std::string> expvars = driver.clear_exp_vars();
+                                                            for(std::string& s : expvars)
+                                                              std::cout << "\t" << s << std::endl;
                                                             driver.insert_statement(*$1, "filter", expvars, *$5);
                                                             delete $1;
                                                             delete $5;
                                                           }
   | IDENTIFIER '=' MAP '(' inclusive_or_expression ')'    { std::cout<<*$1+"=map("+*$5+")"<<std::endl;
                                                             driver.add_var(*$1);
+                                                            std::vector<std::string> expvars = driver.clear_exp_vars();
+                                                            for(std::string& s : expvars)
+                                                              std::cout << "\t" << s << std::endl;
+                                                            driver.insert_statement(*$1, "map", expvars, *$5);
                                                             delete $1;
+                                                            delete $5;
                                                           }
   ;
 

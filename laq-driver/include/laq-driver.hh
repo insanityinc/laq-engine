@@ -44,7 +44,7 @@ class driver {
   void add_var(const std::string& var);
   bool var_exists(const std::string& var);
 
-  // Inserts a new statement in the list representing the query
+  // Inserts a new statement in the list. Return 0 on success
   int insert_statement(const std::string& lvar,
                        const std::string& op,
                        const std::vector<std::string>& rvars = {},
@@ -57,7 +57,6 @@ class driver {
 
  private:
   // Staments of a LA script
-  class statement;
   class parsing_tree;
 
   // Assigned variables of a LA script
@@ -67,10 +66,7 @@ class driver {
   std::vector<std::string> expvars;
 
   // List of statements
-  std::vector<statement> laquery;
-
-  // Tree of statements
-  // util::
+  parsing_tree* laquery;
 };  // class driver
 }  // namespace laq
 

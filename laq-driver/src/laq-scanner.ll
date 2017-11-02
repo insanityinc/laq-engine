@@ -105,7 +105,7 @@ not                     ([nN][oO][tT]|!)
                               return token::FLOAT;
                             }
 <INITIAL>{date}             { yylval->sval = new std::string( yytext );
-                              return token::DATE; 
+                              return token::DATE;
                             }
 
 <INITIAL>{or}               { return token::OR; }
@@ -123,6 +123,9 @@ not                     ([nN][oO][tT]|!)
 
 <INITIAL>{string}           { yylval->sval = new std::string( yytext );
                               return token::STRING;
+                            }
+<INITIAL>"return"           { yylval->sval = new std::string( yytext );
+                              return token::RETURN;
                             }
 <INITIAL>{identifier}       { yylval->sval = new std::string( yytext );
                               toLower( *(yylval->sval) );

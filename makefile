@@ -19,6 +19,7 @@ laq: dir bison flex
 		$(LAQ_FOLDER)/build/laq-parser.cc \
 		$(LAQ_FOLDER)/build/lex.yy.cc \
 		$(LAQ_FOLDER)/src/laq-statement.cc \
+		$(LAQ_FOLDER)/src/parsing-tree.cc \
 		$(LAQ_FOLDER)/src/laq-driver.cc \
 		$(LAQ_FOLDER)/test/laq.cc \
 		-I $(LAQ_FOLDER)/include \
@@ -35,9 +36,11 @@ flex: $(LAQ_FOLDER)/src/laq-scanner.ll
 	flex -o $(LAQ_FOLDER)/build/lex.yy.cc $<
 
 linter:
-	$(LINTER) $(LAQ_FOLDER)/src/laq-driver.cc
 	$(LINTER) $(LAQ_FOLDER)/src/laq-statement.cc
 	$(LINTER) $(LAQ_FOLDER)/src/laq-statement.hh
+	$(LINTER) $(LAQ_FOLDER)/src/parsing-tree.cc
+	$(LINTER) $(LAQ_FOLDER)/src/parsing-tree.hh
+	$(LINTER) $(LAQ_FOLDER)/src/laq-driver.cc
 	$(LINTER) $(LAQ_FOLDER)/include/laq-driver.hh
 
 test: $(LAQ_FOLDER)/bin/laq

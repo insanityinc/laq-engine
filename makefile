@@ -3,7 +3,8 @@ CXX = g++-7.2
 CXXFLAGS = -O2 -std=c++14 -pedantic -Wall -Wextra -Wshadow -Wconversion -Werror
 
 
-LAQ_FOLDER = laq-interface
+LAQ_FOLDER = laq-driver
+ENGINE_FOLDER = engine
 LINTER = lib/cpplint/cpplint.py
 
 all: laq
@@ -42,6 +43,12 @@ linter:
 	$(LINTER) $(LAQ_FOLDER)/src/parsing-tree.hh
 	$(LINTER) $(LAQ_FOLDER)/src/laq-driver.cc
 	$(LINTER) $(LAQ_FOLDER)/include/laq-driver.hh
+	$(LINTER) $(ENGINE_FOLDER)/src/block.cc
+	$(LINTER) $(ENGINE_FOLDER)/src/block.hh
+	$(LINTER) $(ENGINE_FOLDER)/src/matrix.cc
+	$(LINTER) $(ENGINE_FOLDER)/src/krao.cc
+	$(LINTER) $(ENGINE_FOLDER)/include/matrix.hh
+	$(LINTER) $(ENGINE_FOLDER)/include/operators.hh
 
 test: $(LAQ_FOLDER)/bin/laq
 	$(LAQ_FOLDER)/bin/laq $(LAQ_FOLDER)/test/Q14.laq

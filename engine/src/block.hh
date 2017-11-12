@@ -3,6 +3,7 @@
  */
 #ifndef ENGINE_SRC_BLOCK_HH_
 #define ENGINE_SRC_BLOCK_HH_
+#include <vector>
 #include "matrix.hh"
 
 namespace engine {
@@ -17,7 +18,6 @@ class block {
   std::vector<int> rows;
   std::vector<int> columns;
   std::vector<float> values;
-
 }  // class block
 }  // namespace engine
 

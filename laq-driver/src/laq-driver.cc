@@ -18,11 +18,11 @@ driver::~driver() {
 int
 driver::parse(const std::string &f) {
   file = f;
-  if(f.length() <= 4 ) {
+  if (f.length() <= 4) {
     error("Error: Filename too short");
     return 1;
   }
-  if(f.substr(f.length() - 4) != ".laq") {
+  if (f.substr(f.length() - 4) != ".laq") {
     error("Error: LAQ file expected");
     return 2;
   }

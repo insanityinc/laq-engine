@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#ifndef LAQ_INTERFACE_SRC_LAQ_STATEMENT_HH_
-#define LAQ_INTERFACE_SRC_LAQ_STATEMENT_HH_
+#ifndef LAQ_DRIVER_SRC_LAQ_STATEMENT_HH_
+#define LAQ_DRIVER_SRC_LAQ_STATEMENT_HH_
 #include <string>
 #include <vector>
 #include "parsing-tree.hh"
@@ -22,4 +22,4 @@ class driver::parsing_tree::statement {
 
 }  // namespace laq
 
-#endif  // LAQ_INTERFACE_SRC_LAQ_STATEMENT_HH_
+#endif  // LAQ_DRIVER_SRC_LAQ_STATEMENT_HH_

@@ -3,6 +3,8 @@
  */
 #ifndef ENGINE_INCLUDE_MATRIX_HH_
 #define ENGINE_INCLUDE_MATRIX_HH_
+#include <vector>
+#include "../src/block.h"
 
 namespace engine {
 
@@ -12,8 +14,6 @@ class matrix {
   virtual ~matrix();
 
  private:
-  class block;
-
   int nnz;
   int ncols;
   int nrows;

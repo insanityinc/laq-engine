@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#ifndef LAQ_INTERFACE_INCLUDE_LAQ_DRIVER_HH_
-#define LAQ_INTERFACE_INCLUDE_LAQ_DRIVER_HH_
+#ifndef LAQ_DRIVER_INCLUDE_LAQ_DRIVER_HH_
+#define LAQ_DRIVER_INCLUDE_LAQ_DRIVER_HH_
 #include <set>
 #include <string>
 #include <vector>
@@ -70,4 +70,4 @@ class driver {
 };  // class driver
 }  // namespace laq
 
-#endif  // LAQ_INTERFACE_INCLUDE_LAQ_DRIVER_HH_
+#endif  // LAQ_DRIVER_INCLUDE_LAQ_DRIVER_HH_

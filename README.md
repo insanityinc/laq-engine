@@ -14,7 +14,7 @@ Download or clone the project
 git clone https://github.com/Hubble83/dbms.git
 ```
 
-Install flex and bison.
+Install flex and bison (tested with **Flex 2.6.4** and **Bison 3.0.4**).
 
 [Optional] Google cpplint used to check code syntax
 
@@ -82,8 +82,6 @@ Give an example
 ## Built With
 
 * GNU C Compiler version 7.2.0
-* Flex 2.6.4
-* Bison 3.0.4
 
 <!--## Contributing-->
 

@@ -31,7 +31,7 @@ namespace laq { class driver; }
 }
 
 %code {
-# include "laq-driver.hh"
+# include "include/laq-driver.h"
 }
 
 %token END 0 "end of file"

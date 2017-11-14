@@ -1,13 +1,13 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#ifndef LAQ_DRIVER_SRC_PARSING_TREE_HH_
-#define LAQ_DRIVER_SRC_PARSING_TREE_HH_
+#ifndef LAQ_DRIVER_SRC_PARSING_TREE_H_
+#define LAQ_DRIVER_SRC_PARSING_TREE_H_
 #include <map>
 #include <string>
 #include <tuple>
 #include <vector>
-#include "laq-driver.hh"
+#include "include/laq-driver.h"
 
 namespace laq {
 
@@ -28,4 +28,4 @@ class driver::parsing_tree {
 
 }  // namespace laq
 
-#endif  // LAQ_DRIVER_SRC_PARSING_TREE_HH_
+#endif  // LAQ_DRIVER_SRC_PARSING_TREE_H_

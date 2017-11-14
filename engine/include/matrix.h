@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#ifndef ENGINE_INCLUDE_MATRIX_HH_
-#define ENGINE_INCLUDE_MATRIX_HH_
+#ifndef ENGINE_INCLUDE_MATRIX_H_
+#define ENGINE_INCLUDE_MATRIX_H_
 #include <vector>
-#include "../src/block.h"
+#include "src/block.h"
 
 namespace engine {
 
@@ -22,4 +22,4 @@ class matrix {
 }  // class matrix
 }  // namespace engine
 
-#endif  // ENGINE_INCLUDE_MATRIX_HH_
+#endif  // ENGINE_INCLUDE_MATRIX_H_

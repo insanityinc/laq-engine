@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#include "laq-statement.hh"
+#include "src/laq-statement.h"
 
 namespace laq {
 

@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#ifndef LAQ_DRIVER_INCLUDE_LAQ_DRIVER_HH_
-#define LAQ_DRIVER_INCLUDE_LAQ_DRIVER_HH_
+#ifndef LAQ_DRIVER_INCLUDE_LAQ_DRIVER_H_
+#define LAQ_DRIVER_INCLUDE_LAQ_DRIVER_H_
 #include <set>
 #include <string>
 #include <vector>
-#include "laq-parser.hh"
+#include "build/laq-parser.hh"
 
 // Tell Flex the lexer's prototype ...
 #define YY_DECL                                 \
@@ -70,4 +70,4 @@ class driver {
 };  // class driver
 }  // namespace laq
 
-#endif  // LAQ_DRIVER_INCLUDE_LAQ_DRIVER_HH_
+#endif  // LAQ_DRIVER_INCLUDE_LAQ_DRIVER_H_

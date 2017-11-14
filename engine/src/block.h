@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#ifndef ENGINE_SRC_BLOCK_HH_
-#define ENGINE_SRC_BLOCK_HH_
+#ifndef ENGINE_SRC_BLOCK_H_
+#define ENGINE_SRC_BLOCK_H_
 #include <vector>
-#include "matrix.hh"
+// #include "matrix.h"
 
 namespace engine {
 
@@ -13,12 +13,12 @@ class block {
   block();
   virtual ~block();
 
- private:
+  // private:
   int index;
   std::vector<int> rows;
   std::vector<int> columns;
   std::vector<float> values;
-}  // class block
+};  // class block
 }  // namespace engine
 
-#endif  // ENGINE_SRC_BLOCK_HH_
+#endif  // ENGINE_SRC_BLOCK_H_

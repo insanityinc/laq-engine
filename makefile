@@ -5,7 +5,7 @@ CXXFLAGS = -O2 -std=c++14 -pedantic -Wall -Wextra -Wshadow -Wconversion -Werror
 
 LAQ_FOLDER = laq-driver
 ENGINE_FOLDER = engine
-LINTER = lib/cpplint/cpplint.py
+LINTER = lib/styleguide/cpplint/cpplint.py
 
 all: laq
 
@@ -23,8 +23,7 @@ laq: dir bison flex
 		$(LAQ_FOLDER)/src/parsing-tree.cc \
 		$(LAQ_FOLDER)/src/laq-driver.cc \
 		$(LAQ_FOLDER)/test/laq.cc \
-		-I $(LAQ_FOLDER)/include \
-		-I $(LAQ_FOLDER)/build \
+		-I $(LAQ_FOLDER) \
 		-o $(LAQ_FOLDER)/bin/$@ -lfl
 
 dir:
@@ -37,18 +36,11 @@ flex: $(LAQ_FOLDER)/src/laq-scanner.ll
 	flex -o $(LAQ_FOLDER)/build/lex.yy.cc $<
 
 linter:
-	$(LINTER) $(LAQ_FOLDER)/src/laq-statement.cc
-	$(LINTER) $(LAQ_FOLDER)/src/laq-statement.hh
-	$(LINTER) $(LAQ_FOLDER)/src/parsing-tree.cc
-	$(LINTER) $(LAQ_FOLDER)/src/parsing-tree.hh
-	$(LINTER) $(LAQ_FOLDER)/src/laq-driver.cc
-	$(LINTER) $(LAQ_FOLDER)/include/laq-driver.hh
-	$(LINTER) $(ENGINE_FOLDER)/src/block.cc
-	$(LINTER) $(ENGINE_FOLDER)/src/block.hh
-	$(LINTER) $(ENGINE_FOLDER)/src/matrix.cc
-	$(LINTER) $(ENGINE_FOLDER)/src/krao.cc
-	$(LINTER) $(ENGINE_FOLDER)/include/matrix.hh
-	$(LINTER) $(ENGINE_FOLDER)/include/operators.hh
+	$(LINTER) $(LAQ_FOLDER)/src/*.cc
+	$(LINTER) $(LAQ_FOLDER)/*/*.h
+	$(LINTER) $(LAQ_FOLDER)/test/*.cc
+	$(LINTER) $(ENGINE_FOLDER)/src/*.cc
+	$(LINTER) $(ENGINE_FOLDER)/*/*.h
 
 test: $(LAQ_FOLDER)/bin/laq
 	$(LAQ_FOLDER)/bin/laq $(LAQ_FOLDER)/test/Q14.laq

@@ -1,8 +1,9 @@
 /*
  * Copyright (c) 2017 João Afonso. All rights reserved.
  */
-#include "laq-statement.hh"
-#include "parsing-tree.hh"
+#include <utility>
+#include "src/laq-statement.h"
+#include "src/parsing-tree.h"
 
 namespace laq {
 

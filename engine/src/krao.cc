@@ -686,7 +686,7 @@ move_COO_krao_dm_fdm(block* A, block* B, block* C, int rows_A) {
   C->rows.reserve(B->columns.size());
   for (int i = 0; i < B->columns.size(); ++i) {
     int col = B->columns[i];
-    C-> values.push_back(A->values[col] * B->values[i]);
+    C->values.push_back(A->values[col] * B->values[i]);
     C->rows.push_back(A->rows[col] * rows_A + B->rows[i]);
   }
   C->columns = std::move(B->columns);
@@ -702,7 +702,7 @@ COO_krao_dm_fdm(block* A, block* B, block* C, int rows_A) {
   C->rows.reserve(B->columns.size());
   for (int i = 0; i < B->columns.size(); ++i) {
     int col = B->columns[i];
-    C-> values.push_back(A->values[col] * B->values[i]);
+    C->values.push_back(A->values[col] * B->values[i]);
     C->rows.push_back(A->rows[col] * rows_A + B->rows[i]);
   }
   C->columns = B->columns;
@@ -732,14 +732,77 @@ COO_krao_fdm_bm(block* A, block* B, block* C, int rows_A) {
 
 
 // 0x73 (fdm-fbm)
+void
+CSC_krao_fdm_fbm(block* A, block* B, block* C, int rows_A) {
+}
 
+void
+COO_krao_fdm_fbm(block* A, block* B, block* C, int rows_A) {
+  int i = 0, j = 0;
+  while (i < A->columns.size() && j < B->columns.size()) {
+    if ( A->columns[i] < B->columns[j] ) {
+      ++i;
+    } else if ( A->columns[i] > B->columns[j] ) {
+      ++j;
+    } else {
+      C->values.push_back(A->values[i]);
+      C->rows.push_back(A->rows[i] * rows_A + B->rows[j]);
+      C->columns.push_back(A->columns[i]);
+    }
+  }
+}
 
 
 // 0x76 (fdm-dm)
+void
+move_COO_krao_fdm_dm(block* A, block* B, block* C, int rows_A) {
+  C->values.reserve(A->columns.size());
+  C->rows.reserve(A->columns.size());
+  for (int i = 0; i < A->columns.size(); ++i) {
+    int col = B->columns[i];
+    C->values.push_back(A->values[col] * B->values[i]);
+    C->rows.push_back(A->rows[col] * rows_A + B->rows[i]);
+  }
+  C->columns = std::move(A->columns);
+}
 
+void
+CSC_krao_dm_fdm(block* A, block* B, block* C, int rows_A) {
+}
+
+void
+COO_krao_dm_fdm(block* A, block* B, block* C, int rows_A) {
+  C->values.reserve(A->columns.size());
+  C->rows.reserve(A->columns.size());
+  for (int i = 0; i < A->columns.size(); ++i) {
+    int col = B->columns[i];
+    C->values.push_back(A->values[col] * B->values[i]);
+    C->rows.push_back(A->rows[col] * rows_A + B->rows[i]);
+  }
+  C->columns = A->columns;
+}
 
 
 // 0x77 (fdm-fdm)
+void
+CSC_krao_fbm_fdm(block* A, block* B, block* C, int rows_A) {
+}
+
+void
+COO_krao_fdm_fdm(block* A, block* B, block* C, int rows_A) {
+  int i = 0, j = 0;
+  while (i < A->columns.size() && j < B->columns.size()) {
+    if ( A->columns[i] < B->columns[j] ) {
+      ++i;
+    } else if ( A->columns[i] > B->columns[j] ) {
+      ++j;
+    } else {
+      C->values.push_back(A->values[i] * B->values[j]);
+      C->rows.push_back(A->rows[i] * rows_A + B->rows[j]);
+      C->columns.push_back(A->columns[i]);
+    }
+  }
+}
 
 
 
@@ -1112,12 +1175,63 @@ krao(block* A,
       break;
 
     case 0x71:
+      if (CSC)
+        CSC_krao_fbv_fdm(B, A, C);
+      else
+        COO_krao_fbv_fdm(B, A, C);
+      break;
+
     case 0x72:
+      if (move && CSC)
+        move_CSC_krao_bm_fdm(B, A, C, rows_A);
+      else if (move)
+        move_COO_krao_bm_fdm(B, A, C, rows_A);
+      else if (CSC)
+        CSC_krao_bm_fdm(B, A, C, rows_A);
+      else
+        COO_krao_bm_fdm(B, A, C, rows_A);
+      break;
+
     case 0x73:
+      if (CSC)
+        CSC_krao_fdm_fbm(A, B, C, rows_A);
+      else
+        COO_krao_fdm_fbm(A, B, C, rows_A);
+      break;
+
     case 0x74:
+      if (move && CSC)
+        move_CSC_krao_dv_fdm(B, A, C);
+      else if (move)
+        move_COO_krao_dv_fdm(B, A, C);
+      else if (CSC)
+        CSC_krao_dv_fdm(B, A, C);
+      else
+        COO_krao_dv_fdm(B, A, C);
+      break;
+
     case 0x75:
+      if (CSC)
+        CSC_krao_fdv_fdm(B, A, C);
+      else
+        COO_krao_fdv_fdm(B, A, C);
+      break;
+
     case 0x76:
+      if (CSC)
+        CSC_krao_fdm_dm(A, B, C, rows_A);
+      else if (move)
+        move_COO_krao_fdm_dm(A, B, C, rows_A);
+      else
+        COO_krao_fdm_dm(A, B, C, rows_A);
+      break;
+
     case 0x77:
+      if (CSC)
+        CSC_krao_fdm_fdm(A, B, C, rows_A);
+      else
+        COO_krao_fdm_fdm(A, B, C, rows_A);
+      break;
 
     default:
       break;

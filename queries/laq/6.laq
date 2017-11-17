@@ -9,7 +9,7 @@ D = hadamard( A, B )                                                      // 1 <
 E = hadamard( C, D )                                                      // 1 <-- #l
 F = map( l.extendedprice * l.discount )                                   // 1 <-- #l
 G = hadamard( E, F )                                                      // 1 <-- #l
-H = sun( G )                                                              // 1 <-- 1
+H = sum( G )                                                              // 1 <-- 1
 return ( H )                                                              // RESULT
 
 /** Expected result:

@@ -66,7 +66,7 @@ make test
 
 ```
 cd dbms
-make linter -i
+make linter
 ```
 
 <!--Explain what these tests test and why-->

@@ -7,7 +7,7 @@ LAQ_FOLDER = laq-driver
 ENGINE_FOLDER = engine
 LINTER = lib/styleguide/cpplint/cpplint.py
 
-all: laq
+all: $(LAQ_FOLDER)/bin/laq
 
 clean:
 	rm -fr $(LAQ_FOLDER)/build
@@ -15,16 +15,11 @@ clean:
 delete: clean
 	rm -fr $(LAQ_FOLDER)/bin
 
-laq: $(LAQ_FOLDER)/build $(LAQ_FOLDER)/build/laq-parser.cc $(LAQ_FOLDER)/build/lex.yy.cc
+$(LAQ_FOLDER)/bin/laq: $(LAQ_FOLDER)/build/laq-parser.cc $(LAQ_FOLDER)/build/lex.yy.cc
 	$(CXX) $(CXXFLAGS) \
-		$(LAQ_FOLDER)/build/laq-parser.cc \
-		$(LAQ_FOLDER)/build/lex.yy.cc \
-		$(LAQ_FOLDER)/src/laq-statement.cc \
-		$(LAQ_FOLDER)/src/parsing-tree.cc \
-		$(LAQ_FOLDER)/src/laq-driver.cc \
-		$(LAQ_FOLDER)/test/laq.cc \
+		$(LAQ_FOLDER)/*/*.cc \
 		-I $(LAQ_FOLDER) \
-		-o $(LAQ_FOLDER)/bin/$@ -lfl
+		-o $@ -lfl
 
 $(LAQ_FOLDER)/build/laq-parser.cc: $(LAQ_FOLDER)/src/laq-parser.yy $(LAQ_FOLDER)/build
 	bison -o $@ -d $<
@@ -35,7 +30,7 @@ $(LAQ_FOLDER)/build/lex.yy.cc: $(LAQ_FOLDER)/src/laq-scanner.ll $(LAQ_FOLDER)/bu
 $(LAQ_FOLDER)/build:
 	mkdir -p $@ $(LAQ_FOLDER)/bin
 
-linter:
+linter: $(LINTER)
 	$(LINTER) $(LAQ_FOLDER)/src/*.cc
 	$(LINTER) $(LAQ_FOLDER)/*/*.h
 	$(LINTER) $(LAQ_FOLDER)/test/*.cc

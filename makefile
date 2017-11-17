@@ -43,7 +43,8 @@ linter:
 	$(LINTER) $(ENGINE_FOLDER)/*/*.h
 
 test: $(LAQ_FOLDER)/bin/laq
-	$(LAQ_FOLDER)/bin/laq $(LAQ_FOLDER)/test/Q14.laq
+	$(LAQ_FOLDER)/bin/laq queries/laq/6.laq
+	$(LAQ_FOLDER)/bin/laq queries/laq/14.laq
 
 .PHONY: all clean
 	

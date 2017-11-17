@@ -26,7 +26,7 @@ driver::parse(const std::string &f) {
     return 2;
   }
   scan_begin();
-  yy::laq_parser parser(*this);
+  yy::laq_parser parser(this);
   parser.set_debug_level(trace_parsing);
   int res = parser.parse();
   scan_end();

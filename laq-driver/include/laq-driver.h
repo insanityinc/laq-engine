@@ -13,7 +13,7 @@
   yy::laq_parser::token_type                    \
   yylex(yy::laq_parser::semantic_type* yylval,  \
         yy::laq_parser::location_type* yylloc,  \
-        laq::driver& driver)
+        laq::driver* driver)
 // ... and declare it for the parser's sake
 YY_DECL;
 

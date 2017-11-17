@@ -15,7 +15,7 @@ clean:
 delete: clean
 	rm -fr $(LAQ_FOLDER)/bin
 
-laq: dir bison flex
+laq: $(LAQ_FOLDER)/build $(LAQ_FOLDER)/build/laq-parser.cc $(LAQ_FOLDER)/build/lex.yy.cc
 	$(CXX) $(CXXFLAGS) \
 		$(LAQ_FOLDER)/build/laq-parser.cc \
 		$(LAQ_FOLDER)/build/lex.yy.cc \
@@ -26,14 +26,14 @@ laq: dir bison flex
 		-I $(LAQ_FOLDER) \
 		-o $(LAQ_FOLDER)/bin/$@ -lfl
 
-dir:
-	mkdir -p $(LAQ_FOLDER)/build $(LAQ_FOLDER)/bin
+$(LAQ_FOLDER)/build/laq-parser.cc: $(LAQ_FOLDER)/src/laq-parser.yy $(LAQ_FOLDER)/build
+	bison -o $@ -d $<
 
-bison: $(LAQ_FOLDER)/src/laq-parser.yy
-	bison -o $(LAQ_FOLDER)/build/laq-parser.cc -d $<
+$(LAQ_FOLDER)/build/lex.yy.cc: $(LAQ_FOLDER)/src/laq-scanner.ll $(LAQ_FOLDER)/build
+	flex -o $@ $<
 
-flex: $(LAQ_FOLDER)/src/laq-scanner.ll
-	flex -o $(LAQ_FOLDER)/build/lex.yy.cc $<
+$(LAQ_FOLDER)/build:
+	mkdir -p $@ $(LAQ_FOLDER)/bin
 
 linter:
 	$(LINTER) $(LAQ_FOLDER)/src/*.cc
@@ -43,7 +43,9 @@ linter:
 	$(LINTER) $(ENGINE_FOLDER)/*/*.h
 
 test: $(LAQ_FOLDER)/bin/laq
+	@echo "\n========== Parsing TPC-H Query 06 ==========\n"
 	$(LAQ_FOLDER)/bin/laq queries/laq/6.laq
+	@echo "\n========== Parsing TPC-H Query 14 ==========\n"
 	$(LAQ_FOLDER)/bin/laq queries/laq/14.laq
 
 .PHONY: all clean

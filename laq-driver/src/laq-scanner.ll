@@ -130,7 +130,7 @@ not                     ([nN][oO][tT]|!)
                               toLower( *(yylval->sval) );
                               return token::IDENTIFIER;
                             }
-<INITIAL>.                  { driver.error (*yylloc, "Invalid character " + std::string( yytext ) ); }
+<INITIAL>.                  { driver->error (*yylloc, "Invalid character " + std::string( yytext ) ); }
 
 <MLCOMMENT>"*/"             { BEGIN INITIAL; }
 <MLCOMMENT>.                { }
@@ -151,34 +151,30 @@ not                     ([nN][oO][tT]|!)
                               BEGIN INITIAL;
                               return token::REGEXP;
                             }
-<REGEXPRESSION>.            { driver.error(*yylloc, "Invalid character " + std::string(yytext) + " on regular expression"); }
+<REGEXPRESSION>.            { driver->error(*yylloc, "Invalid character " + std::string(yytext) + " on regular expression"); }
 
 %%
 
 
 void
-laq::driver::scan_begin ()
-{
+laq::driver::scan_begin() {
   yy_flex_debug = trace_scanning;
-  if(file.empty() || file == "-")
+  if(file.empty() || file == "-") {
     yyin = stdin;
-  else if(!(yyin = fopen(file.c_str(), "r")))
-  {
+  }
+  else if(!(yyin = fopen(file.c_str(), "r"))) {
     error("Cannot open " + file + ": " + strerror(errno));
     exit(EXIT_FAILURE);
   }
 }
 
 void
-laq::driver::scan_end ()
-{
+laq::driver::scan_end() {
   fclose (yyin);
 }
 
 void
-toLower(std::string& str)
-{
+toLower(std::string& str) {
   for(char& c : str)
     c = (char) tolower(c);
 }
-

@@ -23,11 +23,17 @@ cd dbms/lib
 git clone https://github.com/google/styleguide.git
 ```
 
-[Optional] Google test used for unit testing
+[Optional] Google test used for unit testing, use your C++ compiler
 
 ```
+CXX=g++-7.2
+
 cd dbms/lib
 git clone https://github.com/google/googletest.git
+GTEST_DIR=lib/googletest/googletest
+$CXX -isystem $GTEST_DIR/include -I$GTEST_DIR \
+     -pthread -c $GTEST_DIR/src/gtest-all.cc
+ar -rv libgtest.a gtest-all.o
 ```
 
 ### Installing

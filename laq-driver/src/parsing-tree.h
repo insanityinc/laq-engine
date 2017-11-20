@@ -20,10 +20,13 @@ class driver::parsing_tree {
                         const std::vector<std::string>& rvars,
                         const std::string& expr);
 
+  std::string getQuery();
+
  private:
   class statement;
 
   std::map<std::string, statement> tree;
+  std::vector<std::string> vars;
 };  // class parsing_tree
 
 }  // namespace laq

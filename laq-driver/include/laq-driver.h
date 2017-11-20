@@ -50,6 +50,9 @@ class driver {
                        const std::vector<std::string>& rvars = {},
                        const std::string& expr = "");
 
+  // Provides parsed query in string format
+  std::string getQuery();
+
   // Add variable contained in any expression
   void add_exp_var(const std::string& var);
   // Get variables of current expression and clear the temporary storage

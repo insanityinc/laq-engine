@@ -74,8 +74,7 @@ laquery
   ;
 
 statement
-  : IDENTIFIER '=' product '(' ident ',' ident ')'        { std::cout << *$1+"="+*$3+"("+*$5+","+*$7+")" << std::endl;
-                                                            if(driver->var_exists(*$1))
+  : IDENTIFIER '=' product '(' ident ',' ident ')'        { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             driver->insert_statement(*$1, *$3, std::vector<std::string> {*$5, *$7});
@@ -84,8 +83,7 @@ statement
                                                             delete $5;
                                                             delete $7;
                                                           }
-  | IDENTIFIER '=' bang '(' ident ')'                     { std::cout << *$1+"="+*$3+"("+*$5+")" << std::endl;
-                                                            if(driver->var_exists(*$1))
+  | IDENTIFIER '=' bang '(' ident ')'                     { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             driver->insert_statement(*$1, *$3, std::vector<std::string> {*$5});
@@ -93,8 +91,7 @@ statement
                                                             delete $3;
                                                             delete $5;
                                                           }
-  | IDENTIFIER '=' FILTER '(' expression ')'              { std::cout << *$1+"=filter("+*$5+")" << std::endl;
-                                                            if(driver->var_exists(*$1))
+  | IDENTIFIER '=' FILTER '(' expression ')'              { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             std::vector<std::string> expvars = driver->clear_exp_vars();
@@ -102,8 +99,7 @@ statement
                                                             delete $1;
                                                             delete $5;
                                                           }
-  | IDENTIFIER '=' MAP '(' inclusive_or_expression ')'    { std::cout << *$1+"=map("+*$5+")" << std::endl;
-                                                            if(driver->var_exists(*$1))
+  | IDENTIFIER '=' MAP '(' inclusive_or_expression ')'    { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             std::vector<std::string> expvars = driver->clear_exp_vars();
@@ -112,10 +108,6 @@ statement
                                                             delete $5;
                                                           }
   | RETURN '(' varlist ')'                                { std::vector<std::string> varlist = driver->clear_exp_vars();
-                                                            std::cout << "return(" << varlist.front();
-                                                            for(unsigned int i=1; i<varlist.size(); ++i)
-                                                              std::cout << ", " << varlist[i] << std::endl;
-                                                            std::cout << ")" << std::endl;
                                                             driver->insert_statement("$$", "return", varlist);
                                                           }
   ;

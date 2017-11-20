@@ -159,10 +159,10 @@ not                     ([nN][oO][tT]|!)
 void
 laq::driver::scan_begin() {
   yy_flex_debug = trace_scanning;
-  if(file.empty() || file == "-") {
+  if (file.empty() || file == "-") {
     yyin = stdin;
   }
-  else if(!(yyin = fopen(file.c_str(), "r"))) {
+  else if (!(yyin = fopen(file.c_str(), "r"))) {
     error("Cannot open " + file + ": " + strerror(errno));
     exit(EXIT_FAILURE);
   }
@@ -170,11 +170,11 @@ laq::driver::scan_begin() {
 
 void
 laq::driver::scan_end() {
-  fclose (yyin);
+  fclose(yyin);
 }
 
 void
 toLower(std::string& str) {
-  for(char& c : str)
+  for (char& c : str)
     c = (char) tolower(c);
 }

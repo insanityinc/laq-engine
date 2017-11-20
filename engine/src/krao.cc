@@ -5,7 +5,6 @@
 
 namespace engine {
 
-
 enum type {
   filtered_bit_vector = 0x1,  // fbv: --c
   bitmap = 0x2,  // bm: -r-
@@ -28,12 +27,15 @@ void
 COO_krao_fbv_fbv(block* A, block* B, block* C) {
   size_t i = 0, j = 0;
   while (i < A->columns.size() && j < B->columns.size()) {
-    if ( A->columns[i] < B->columns[j] )
+    if ( A->columns[i] < B->columns[j] ) {
       ++i;
-    else if ( A->columns[i] > B->columns[j] )
+    } else if ( A->columns[i] > B->columns[j] ) {
       ++j;
-    else
+    } else {
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
+    }
   }
 }
 
@@ -84,6 +86,8 @@ COO_krao_fbv_fbm(block* A, block* B, block* C) {
     } else {
       C->rows.push_back(B->rows[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -135,6 +139,8 @@ COO_krao_fbv_fdv(block* A, block* B, block* C) {
     } else {
       C->values.push_back(B->values[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -191,6 +197,8 @@ COO_krao_fbv_fdm(block* A, block* B, block* C) {
       C->values.push_back(B->values[j]);
       C->rows.push_back(B->rows[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -382,6 +390,8 @@ COO_krao_fbm_fbm(block* A, block* B, block* C, int rows_A) {
     } else {
       C->rows.push_back(A->rows[i] * rows_A + B->rows[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -434,6 +444,8 @@ COO_krao_fbm_fdv(block* A, block* B, block* C) {
       C->values.push_back(B->values[j]);
       C->rows.push_back(A->rows[i]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -490,6 +502,8 @@ COO_krao_fbm_fdm(block* A, block* B, block* C, int rows_A) {
       C->values.push_back(B->values[j]);
       C->rows.push_back(A->rows[i] * rows_A + B->rows[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -608,6 +622,8 @@ COO_krao_fdv_fdv(block* A, block* B, block* C) {
     } else {
       C->values.push_back(A->values[i] * B->values[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -666,6 +682,8 @@ COO_krao_fdv_fdm(block* A, block* B, block* C) {
       C->values.push_back(A->values[i] * B->values[j]);
       C->rows.push_back(B->rows[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -808,6 +826,8 @@ COO_krao_fdm_fbm(block* A, block* B, block* C, int rows_A) {
       C->values.push_back(A->values[i]);
       C->rows.push_back(A->rows[i] * rows_A + B->rows[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -864,6 +884,8 @@ COO_krao_fdm_fdm(block* A, block* B, block* C, int rows_A) {
       C->values.push_back(A->values[i] * B->values[j]);
       C->rows.push_back(A->rows[i] * rows_A + B->rows[j]);
       C->columns.push_back(A->columns[i]);
+      ++i;
+      ++j;
     }
   }
 }
@@ -871,12 +893,8 @@ COO_krao_fdm_fdm(block* A, block* B, block* C, int rows_A) {
 
 
 void
-krao(block* A,
-     block* B,
-     block* C,
-     int rows_A,
-     bool CSC = false,
-     bool move = false) {
+krao(block* A, block* B, block* C,
+     int rows_A, bool CSC, bool move) {
   #ifdef DEBUG
     assert(A->index == B->index);
   #endif  // DEBUG

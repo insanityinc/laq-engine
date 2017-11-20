@@ -14,4 +14,21 @@ driver::parsing_tree::statement::statement(
   rightvars = rvars;
 }
 
+std::string
+driver::parsing_tree::statement::toString() {
+  std::string res = operation + "(";
+  if (!expression.empty()) {
+    res += expression + ")";
+  } else if (!rightvars.empty()) {
+    int i = -1;
+    for (auto& rv : rightvars) {
+      if (++i)
+        res += ",";
+      res += rv;
+    }
+    res+=")";
+  }
+  return res;
+}
+
 }  // namespace laq

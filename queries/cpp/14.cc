@@ -1,52 +1,54 @@
-/** Example of C++ main function
-  * TPC-H Query 14
-  *
-  * Query in SQL format:
-  *
-  *  select
-  *    100.00 * sum(case
-  *      when p_type like 'PROMO%'
-  *        then l_extendedprice * (1 - l_discount)
-  *      else 0
-  *    end) / sum(l_extendedprice * (1 - l_discount)) as promo_revenue
-  *  from
-  *    lineitem,
-  *    part
-  *  where
-  *    l_partkey = p_partkey
-  *    and l_shipdate >= date ''
-  *    and l_shipdate < date '' + interval '1' month;
-  *
-  * Query in DSL format:
-  *
-  *  A = filter( match( p.type , ".+PROMO.+" ) )
-  *  B = dot( A, l.partkey )
-  *  C = filter( l.shipdate >= "" )
-  *  D = filter( l.shipdate < "" )
-  *  E = hadamard( C, D )
-  *  F = hadamard( B, E )
-  *  G = map( l.extendedprice*(1-l.discount) )
-  *  H = hadamard( F, G )
-  *  I = sum( G )
-  *  J = sum( H )
-  *  K = map( 100.00 * J / I )
-  *  return ( K )
-  *
-  * Query dependence graph:
-  *
-  *  p.type --> A --
-  *                 |--> B ---------
-  *  l.partkey -----                |
-  *                                 |--> F --
-  *                --> C --         |        |
-  *  l.shipdate --|        |--> E --         |
-  *                --> D --                  |--> H --> J --
-  *                                          |              |
-  *  l.extendedprice --                      |              |--> K
-  *                    |--> G ---------------               |
-  *  l.discount -------         |                           |
-  *                              --> I ---------------------
-  */
+/*
+ * Copyright (c) 2017 João Afonso. All rights reserved.
+ * Example of C++ main function
+ * TPC-H Query 14
+ *
+ * Query in SQL format:
+ *
+ *  select
+ *    100.00 * sum(case
+ *      when p_type like 'PROMO%'
+ *        then l_extendedprice * (1 - l_discount)
+ *      else 0
+ *    end) / sum(l_extendedprice * (1 - l_discount)) as promo_revenue
+ *  from
+ *    lineitem,
+ *    part
+ *  where
+ *    l_partkey = p_partkey
+ *    and l_shipdate >= date ''
+ *    and l_shipdate < date '' + interval '1' month;
+ *
+ * Query in DSL format:
+ *
+ *  A = filter( match( p.type , ".+PROMO.+" ) )
+ *  B = dot( A, l.partkey )
+ *  C = filter( l.shipdate >= "" )
+ *  D = filter( l.shipdate < "" )
+ *  E = hadamard( C, D )
+ *  F = hadamard( B, E )
+ *  G = map( l.extendedprice*(1-l.discount) )
+ *  H = hadamard( F, G )
+ *  I = sum( G )
+ *  J = sum( H )
+ *  K = map( 100.00 * J / I )
+ *  return ( K )
+ *
+ * Query dependence graph:
+ *
+ *  p.type --> A --
+ *                 |--> B ---------
+ *  l.partkey -----                |
+ *                                 |--> F --
+ *                --> C --         |        |
+ *  l.shipdate --|        |--> E --         |
+ *                --> D --                  |--> H --> J --
+ *                                          |              |
+ *  l.extendedprice --                      |              |--> K
+ *                    |--> G ---------------               |
+ *  l.discount -------         |                           |
+ *                              --> I ---------------------
+ */
 
 inline bool filter_a(auto p_type) {
   return match(p_type, ".+PROMO.+");
@@ -69,7 +71,6 @@ inline auto map_k(auto j, auto i) {
 }
 
 int main() {
-
   /** Como B depende de A, calcula-se A
     * Pré-condição: --
     * Pós-condição: A calculado e guardado na RAM
@@ -80,12 +81,11 @@ int main() {
   // out:
   Matrix a;
 
-  for(int i = 0; i < p_type.n_blocks; ++i) {
+  for (int i = 0; i < p_type.n_blocks; ++i) {
     p_type.load(i);
     filter(/*filter:*/ filter_a,
            /*in:*/ p_type.blocks[i],
-           /*out:*/ a.blocks[i]
-    );
+           /*out:*/ a.blocks[i]);
     p_type.delete(i);
   }
 
@@ -100,15 +100,14 @@ int main() {
   // out:
   Matrix g;
 
-  for(int i = 0; i < l_discount.n_blocks; ++i) {
+  for (int i = 0; i < l_discount.n_blocks; ++i) {
     // load:
     l_extendedprice.load(i);
     l_discount.load(i);
     // compute:
     map(/*map:*/ map_g,
         /*out:*/ g.blocks[i],
-        /*arguments:*/ l_extendedprice.blocks[i], l_discount.blocks[i]
-    );
+        /*arguments:*/ l_extendedprice.blocks[i], l_discount.blocks[i]);
     // delete:
     l_extendedprice.delete(i);
     l_discount.delete(i);
@@ -127,7 +126,7 @@ int main() {
   // out:
   Matrix h;
 
-  for(int i = 0; i < l_partkey.n_blocks; ++i) {
+  for (int i = 0; i < l_partkey.n_blocks; ++i) {
     // load:
     l_partkey.load(i);
     l_shipdate.load(i);
@@ -135,21 +134,16 @@ int main() {
     dot(a, l_partkey.blocks[i], b.blocks[i]);
     filter(/*filter:*/ filter_c,
            /*in:*/ l_shipdate.blocks[i],
-           /*out:*/ c.blocks[i]
-    );
+           /*out:*/ c.blocks[i]);
     filter(/*filter:*/ filter_d,
            /*in:*/ l_shipdate.blocks[i],
-           /*out:*/ d.blocks[i]
-    );
+           /*out:*/ d.blocks[i]);
     hadamard(/*in:*/ c.blocks[i], d.blocks[i],
-             /*out:*/ d.blocks[i]
-    );
+             /*out:*/ d.blocks[i]);
     hadamard(/*in:*/ b.blocks[i], e.blocks[i],
-             /*out:*/ f.blocks[i]
-    );
+             /*out:*/ f.blocks[i]);
     hadamard(/*in:*/ f.blocks[i], g.blocks[i],
-             /*out:*/ h.blocks[i]
-    );
+             /*out:*/ h.blocks[i]);
     // delete:
     l_partkey.delete(i);
     l_shipdate.delete(i);
@@ -175,8 +169,7 @@ int main() {
   // load: --
   // compute:
   sum(/*in:*/ h,
-      /*out:*/ j
-  );
+      /*out:*/ j);
   // delete:
   h.deleteAll();
 
@@ -193,8 +186,7 @@ int main() {
   // load: --
   // compute:
   sum(/*in:*/ g,
-      /*out:*/ i
-  );
+      /*out:*/ i);
   // delete:
   g.deleteAll();
 
@@ -208,13 +200,12 @@ int main() {
   // out:
   Matrix k;
 
-  for(int i = 0; i < j.n_blocks; ++i) {
+  for (int i = 0; i < j.n_blocks; ++i) {
     // load: --
     // compute:
     map(/*map:*/ map_k,
         /*out:*/ k.blocks[i],
-        /*arguments:*/ j.blocks[i], i.blocks[i]
-    );
+        /*arguments:*/ j.blocks[i], i.blocks[i]);
     // delete:
   }
 

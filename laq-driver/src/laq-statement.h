@@ -15,6 +15,8 @@ class driver::parsing_tree::statement {
             const std::string& expr,
             const std::vector<std::string>& rvars);
 
+  std::string toString();
+
   std::string operation;
   std::string expression;
   std::vector<std::string> rightvars;

@@ -64,6 +64,11 @@ driver::insert_statement(const std::string& lvar,
   return 0;
 }
 
+std::string
+driver::getQuery() {
+  return laquery->getQuery();
+}
+
 void
 driver::add_exp_var(const std::string& var) {
   expvars.push_back(var);

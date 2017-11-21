@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     bm->add_rows(r);
 
   fbm = google::protobuf::Arena::CreateMessage<engine::block>(&arena);
-  for (int i = 0; i < frows.size(); ++i) {
+  for (unsigned int i = 0; i < frows.size(); ++i) {
     fbm->add_rows(frows[i]);
     fbm->add_columns(fcolumns[i]);
   }
@@ -90,19 +90,19 @@ int main(int argc, char **argv) {
     dv->add_values(v);
 
   fdv = google::protobuf::Arena::CreateMessage<engine::block>(&arena);
-  for (int i = 0; i < fvalues.size(); ++i) {
+  for (unsigned int i = 0; i < fvalues.size(); ++i) {
     fdv->add_values(fvalues[i]);
     fdv->add_columns(fcolumns[i]);
   }
 
   dm = google::protobuf::Arena::CreateMessage<engine::block>(&arena);
-  for (int i = 0; i < values.size(); ++i) {
+  for (unsigned int i = 0; i < values.size(); ++i) {
     dm->add_values(values[i]);
     dm->add_rows(rows[i]);
   }
 
   fdm = google::protobuf::Arena::CreateMessage<engine::block>(&arena);
-  for (int i = 0; i < fvalues.size(); ++i) {
+  for (unsigned int i = 0; i < fvalues.size(); ++i) {
     fdm->add_values(fvalues[i]);
     fdm->add_rows(frows[i]);
     fdm->add_columns(fcolumns[i]);

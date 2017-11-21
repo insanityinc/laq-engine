@@ -1,6 +1,6 @@
 CXX = g++-7.2
-CXXFLAGS = 
-#-O2 -std=c++14 -pedantic -Wall -Wextra -Wshadow -Wconversion -Werror
+CXXFLAGS = -O2 -std=c++14 -pedantic -Wall -Wextra -Wshadow -Wconversion
+#-Werror
 
 LAQ_DIR = laq-driver
 ENGINE_DIR = engine
@@ -23,10 +23,16 @@ test:
 	$(LAQ_DIR)/bin/test-laq
 	$(ENGINE_DIR)/bin/test-krao
 
+$(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
+						   $(ENGINE_DIR)/build/matrix.pb.o \
+						   $(ENGINE_DIR)/build/block.pb.o \
+						   $(ENGINE_DIR)/build/io.o
+	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
+
 $(ENGINE_DIR)/bin/test-krao: $(ENGINE_DIR)/test/test-krao.cc \
 							 $(ENGINE_DIR)/build/block.pb.o \
 							 $(ENGINE_DIR)/build/krao.o
-	$(CXX) -g -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
+	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
 
 $(LAQ_DIR)/bin/test-laq: $(LAQ_DIR)/test/test-laq.cc \
 						 $(LAQ_DIR)/build/laq-parser.o \
@@ -34,11 +40,7 @@ $(LAQ_DIR)/bin/test-laq: $(LAQ_DIR)/test/test-laq.cc \
 						 $(LAQ_DIR)/build/laq-driver.o \
 						 $(LAQ_DIR)/build/parsing-tree.o \
 						 $(LAQ_DIR)/build/laq-statement.o
-	$(CXX) -g -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(LAQ_DIR)
-
-#$(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
-							  $(ENGINE_DIR)/build/block.o \
-							  $(ENGINE_DIR)/build/matrix.o
+	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(LAQ_DIR)
 
 $(LAQ_DIR)/build/laq-parser.o: $(LAQ_DIR)/build/laq-parser.cc
 	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(LAQ_DIR)/build -o $@
@@ -74,6 +76,12 @@ $(ENGINE_DIR)/build/block.pb.o: $(ENGINE_DIR)/src/block.pb.cc
 	$(CXX) $(CXXFLAGS) -c $< -I . -o $@
 
 $(ENGINE_DIR)/src/block.pb.cc: $(ENGINE_DIR)/src/block.proto
+	protoc --cpp_out=. $<
+
+$(ENGINE_DIR)/build/matrix.pb.o: $(ENGINE_DIR)/src/matrix.pb.cc
+	$(CXX) $(CXXFLAGS) -c $< -I . -o $@
+
+$(ENGINE_DIR)/src/matrix.pb.cc: $(ENGINE_DIR)/src/matrix.proto
 	protoc --cpp_out=. $<
 
 $(ENGINE_DIR)/build:

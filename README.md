@@ -19,6 +19,7 @@ Install flex and bison (tested with **Flex 2.6.4** and **Bison 3.0.4**).
 Install Google Protocol Buffers (follow Google tutorial or use this commands)
 
 ```
+mkdir dbms/lib
 cd dbms/lib
 git clone https://github.com/google/protobuf.git
 cd protobuf
@@ -34,6 +35,7 @@ sudo ldconfig
 [Optional] Google cpplint used to check code syntax
 
 ```
+mkdir dbms/lib
 cd dbms/lib
 git clone https://github.com/google/styleguide.git
 ```
@@ -43,6 +45,7 @@ git clone https://github.com/google/styleguide.git
 ```
 CXX=g++-7.2
 
+mkdir dbms/lib
 cd dbms/lib
 git clone https://github.com/google/googletest.git
 GTEST_DIR=lib/googletest/googletest

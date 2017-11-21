@@ -24,13 +24,14 @@ test:
 	$(ENGINE_DIR)/bin/test-krao
 
 $(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
-						   $(ENGINE_DIR)/build/matrix.pb.o \
 						   $(ENGINE_DIR)/build/block.pb.o \
+						   $(ENGINE_DIR)/build/matrix.pb.o \
 						   $(ENGINE_DIR)/build/io.o
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
 
 $(ENGINE_DIR)/bin/test-krao: $(ENGINE_DIR)/test/test-krao.cc \
 							 $(ENGINE_DIR)/build/block.pb.o \
+							 $(ENGINE_DIR)/build/matrix.pb.o \
 							 $(ENGINE_DIR)/build/krao.o
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
 
@@ -73,16 +74,16 @@ $(ENGINE_DIR)/build/krao.o: $(ENGINE_DIR)/src/krao.cc
 	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
 
 $(ENGINE_DIR)/build/block.pb.o: $(ENGINE_DIR)/src/block.pb.cc
-	$(CXX) $(CXXFLAGS) -c $< -I . -o $@
+	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
 
 $(ENGINE_DIR)/src/block.pb.cc: $(ENGINE_DIR)/src/block.proto
-	protoc --cpp_out=. $<
+	protoc --cpp_out=engine --proto_path=engine $<
 
 $(ENGINE_DIR)/build/matrix.pb.o: $(ENGINE_DIR)/src/matrix.pb.cc
-	$(CXX) $(CXXFLAGS) -c $< -I . -o $@
+	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
 
 $(ENGINE_DIR)/src/matrix.pb.cc: $(ENGINE_DIR)/src/matrix.proto
-	protoc --cpp_out=. $<
+	protoc --cpp_out=engine --proto_path=engine $<
 
 $(ENGINE_DIR)/build:
 	mkdir -p $@ $(ENGINE_DIR)/bin

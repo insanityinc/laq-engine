@@ -48,7 +48,7 @@ CXX=g++-7.2
 mkdir dbms/lib
 cd dbms/lib
 git clone https://github.com/google/googletest.git
-GTEST_DIR=lib/googletest/googletest
+GTEST_DIR=googletest/googletest
 $CXX -isystem $GTEST_DIR/include -I$GTEST_DIR \
      -pthread -c $GTEST_DIR/src/gtest-all.cc
 ar -rv libgtest.a gtest-all.o

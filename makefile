@@ -1,83 +1,95 @@
 CXX = g++-7.2
-CXXFLAGS = -O2 -std=c++14 -pedantic -Wall -Wextra -Wshadow -Wconversion -Werror
+CXXFLAGS = 
+#-O2 -std=c++14 -pedantic -Wall -Wextra -Wshadow -Wconversion -Werror
 
-LAQ_FOLDER = laq-driver
-ENGINE_FOLDER = engine
+LAQ_DIR = laq-driver
+ENGINE_DIR = engine
 LINTER = lib/styleguide/cpplint/cpplint.py
 GTEST_DIR =  lib/googletest/googletest/include
 
-all: $(LAQ_FOLDER)/bin/test-laq $(ENGINE_FOLDER)/bin/test-krao
+all: $(LAQ_DIR)/build \
+	 $(ENGINE_DIR)/build \
+	 $(LAQ_DIR)/bin/test-laq \
+	 $(ENGINE_DIR)/bin/test-krao #\
+	 $(ENGINE_DIR)/bin/test-io
 
 clean:
-	rm -fr $(LAQ_FOLDER)/build $(ENGINE_FOLDER)/build
+	rm -fr $(LAQ_DIR)/build $(ENGINE_DIR)/build $(ENGINE_DIR)/src/*.pb.*
 
 delete: clean
-	rm -fr $(LAQ_FOLDER)/bin $(ENGINE_FOLDER)/bin
+	rm -fr $(LAQ_DIR)/bin $(ENGINE_DIR)/bin
 
-test: $(LAQ_FOLDER)/bin/test-laq $(ENGINE_FOLDER)/bin/test-krao
-	$<
-	$(ENGINE_FOLDER)/bin/test-krao
+test:
+	$(LAQ_DIR)/bin/test-laq
+	$(ENGINE_DIR)/bin/test-krao
 
-$(ENGINE_FOLDER)/bin/test-krao: $(ENGINE_FOLDER)/test/test-krao.cc \
-								$(ENGINE_FOLDER)/build/block.o \
-								$(ENGINE_FOLDER)/build/krao.o
-	$(CXX) -g -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_FOLDER)
+$(ENGINE_DIR)/bin/test-krao: $(ENGINE_DIR)/test/test-krao.cc \
+							 $(ENGINE_DIR)/build/block.pb.o \
+							 $(ENGINE_DIR)/build/krao.o
+	$(CXX) -g -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
 
-$(LAQ_FOLDER)/bin/test-laq: $(LAQ_FOLDER)/test/test-laq.cc \
-							$(LAQ_FOLDER)/build/laq-parser.o \
-							$(LAQ_FOLDER)/build/lex.yy.o \
-							$(LAQ_FOLDER)/build/laq-driver.o \
-							$(LAQ_FOLDER)/build/parsing-tree.o \
-							$(LAQ_FOLDER)/build/laq-statement.o
-	$(CXX) -g -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(LAQ_FOLDER)
+$(LAQ_DIR)/bin/test-laq: $(LAQ_DIR)/test/test-laq.cc \
+						 $(LAQ_DIR)/build/laq-parser.o \
+						 $(LAQ_DIR)/build/lex.yy.o \
+						 $(LAQ_DIR)/build/laq-driver.o \
+						 $(LAQ_DIR)/build/parsing-tree.o \
+						 $(LAQ_DIR)/build/laq-statement.o
+	$(CXX) -g -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(LAQ_DIR)
 
-$(LAQ_FOLDER)/build/laq-parser.o: $(LAQ_FOLDER)/build/laq-parser.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_FOLDER) -I $(LAQ_FOLDER)/build -o $@
+#$(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
+							  $(ENGINE_DIR)/build/block.o \
+							  $(ENGINE_DIR)/build/matrix.o
 
-$(LAQ_FOLDER)/build/lex.yy.o: $(LAQ_FOLDER)/build/lex.yy.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_FOLDER) -o $@
+$(LAQ_DIR)/build/laq-parser.o: $(LAQ_DIR)/build/laq-parser.cc
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(LAQ_DIR)/build -o $@
 
-$(LAQ_FOLDER)/build/laq-driver.o: $(LAQ_FOLDER)/src/laq-driver.cc $(LAQ_FOLDER)/build
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_FOLDER) -o $@
+$(LAQ_DIR)/build/lex.yy.o: $(LAQ_DIR)/build/lex.yy.cc
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
 
-$(LAQ_FOLDER)/build/parsing-tree.o: $(LAQ_FOLDER)/src/parsing-tree.cc $(LAQ_FOLDER)/build
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_FOLDER) -o $@
+$(LAQ_DIR)/build/laq-driver.o: $(LAQ_DIR)/src/laq-driver.cc
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
 
-$(LAQ_FOLDER)/build/laq-statement.o: $(LAQ_FOLDER)/src/laq-statement.cc $(LAQ_FOLDER)/build
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_FOLDER) -o $@
+$(LAQ_DIR)/build/parsing-tree.o: $(LAQ_DIR)/src/parsing-tree.cc
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
 
-$(LAQ_FOLDER)/build/laq-parser.cc: $(LAQ_FOLDER)/src/laq-parser.yy $(LAQ_FOLDER)/build
+$(LAQ_DIR)/build/laq-statement.o: $(LAQ_DIR)/src/laq-statement.cc
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+
+$(LAQ_DIR)/build/laq-parser.cc: $(LAQ_DIR)/src/laq-parser.yy
 	bison -o $@ -d $<
 
-$(LAQ_FOLDER)/build/lex.yy.cc: $(LAQ_FOLDER)/src/laq-scanner.ll $(LAQ_FOLDER)/build
+$(LAQ_DIR)/build/lex.yy.cc: $(LAQ_DIR)/src/laq-scanner.ll
 	flex -o $@ $<
 
-$(LAQ_FOLDER)/build:
-	mkdir -p $@ $(LAQ_FOLDER)/bin
+$(LAQ_DIR)/build:
+	mkdir -p $@ $(LAQ_DIR)/bin
 
-$(ENGINE_FOLDER)/bin/engine: $(ENGINE_FOLDER)/build/krao.o
+$(ENGINE_DIR)/bin/engine: $(ENGINE_DIR)/build/krao.o
 	$(CXX) $(CXXFLAGS) $< -o $@
 
-$(ENGINE_FOLDER)/build/krao.o: $(ENGINE_FOLDER)/src/krao.cc $(ENGINE_FOLDER)/build
-	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_FOLDER) -o $@
+$(ENGINE_DIR)/build/krao.o: $(ENGINE_DIR)/src/krao.cc
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
 
-$(ENGINE_FOLDER)/build/block.o: $(ENGINE_FOLDER)/src/block.cc $(ENGINE_FOLDER)/build
-	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_FOLDER) -o $@
+$(ENGINE_DIR)/build/block.pb.o: $(ENGINE_DIR)/src/block.pb.cc
+	$(CXX) $(CXXFLAGS) -c $< -I . -o $@
 
-$(ENGINE_FOLDER)/build:
-	mkdir -p $@ $(ENGINE_FOLDER)/bin
+$(ENGINE_DIR)/src/block.pb.cc: $(ENGINE_DIR)/src/block.proto
+	protoc --cpp_out=. $<
+
+$(ENGINE_DIR)/build:
+	mkdir -p $@ $(ENGINE_DIR)/bin
 
 
 linter: $(LINTER)
-	$(LINTER) $(LAQ_FOLDER)/src/*.cc
-	$(LINTER) $(LAQ_FOLDER)/*/*.h
-	$(LINTER) $(LAQ_FOLDER)/test/*.cc
-	$(LINTER) $(ENGINE_FOLDER)/src/*.cc
-	$(LINTER) $(ENGINE_FOLDER)/*/*.h
-	$(LINTER) $(ENGINE_FOLDER)/test/*.cc
+	$(LINTER) $(LAQ_DIR)/src/*.cc
+	$(LINTER) $(LAQ_DIR)/*/*.h
+	$(LINTER) $(LAQ_DIR)/test/*.cc
+	$(LINTER) $(ENGINE_DIR)/src/*.cc
+	$(LINTER) $(ENGINE_DIR)/*/*.h
+	$(LINTER) $(ENGINE_DIR)/test/*.cc
 	$(LINTER) queries/cpp/*.cc
 
-.PHONY: all clean delete linter test laq engine
+.PHONY: all clean delete linter test
 	
 	
 #a: b c

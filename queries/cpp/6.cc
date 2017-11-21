@@ -23,10 +23,10 @@ inline auto map_f(auto l_extendedprice, auto l_discount) {
 }
 
 int main() {
-  Matrix l_shipdate;
-  Matrix l_discount;
-  Matrix l_quantity;
-  Matrix l_extendedprice;
+  Matrix l_shipdate("data/lineitem/shipdate");
+  Matrix l_discount("data/lineitem/discount");
+  Matrix l_quantity("data/lineitem/quantity");
+  Matrix l_extendedprice("data/lineitem/extendedprice");
 
   Matrix a, b, c, d, e, f, g, h;
 

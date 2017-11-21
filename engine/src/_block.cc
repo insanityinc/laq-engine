@@ -5,19 +5,15 @@
 
 namespace engine {
 
-block::block(const int idx) {
-  index = idx;
+block::block() {
   values = std::vector<float>();
   rows = std::vector<int>();
   columns = std::vector<int>();
 }
 
-block::block(const int idx,
-             const std::vector<float>& v,
+block::block(const std::vector<float>& v,
              const std::vector<int>& r,
              const std::vector<int>& c)
-    : index(idx), values(v), rows(r), columns(c) {}
-
-
+    : values(v), rows(r), columns(c) {}
 
 }  // namespace engine

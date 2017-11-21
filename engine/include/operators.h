@@ -3,7 +3,7 @@
  */
 #ifndef ENGINE_INCLUDE_OPERATORS_H_
 #define ENGINE_INCLUDE_OPERATORS_H_
-#include "src/block.h"
+#include "src/block.pb.h"
 
 namespace engine {
 

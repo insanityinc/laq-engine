@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package engine;
+
+import "src/block.proto";
+
+option cc_enable_arenas = true;
+
+message matrix {
+  optional string path = 1;
+  required int32 nnz = 2;
+  required int32 nrows = 3;
+  required int32 ncols = 4;
+  optional map<int32, block> blocks = 5;
+}

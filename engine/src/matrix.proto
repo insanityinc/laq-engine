@@ -1,15 +1,26 @@
 syntax = "proto3";
 
 package engine;
-
 import "src/block.proto";
+import "src/label-block.proto";
 
 option cc_enable_arenas = true;
 
 message matrix {
-  string path = 1;
-  int32 nnz = 2;
-  int32 nrows = 3;
-  int32 ncols = 4;
-  map<int32, block> blocks = 5;
+  // matrix identifiers
+  string database_path = 1;
+  string table = 2;
+  string column = 3;
+
+  // matrix dimensions
+  int32 nnz = 4;
+  int32 nrows = 5;
+  int32 ncols = 6;
+
+  // matrix content
+  map<int32, block> blocks = 7;
+  
+  // matrix labels
+  map<int32, label_block> labels = 8;
 }
+

@@ -26,12 +26,14 @@ test:
 $(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
 						   $(ENGINE_DIR)/build/block.pb.o \
 						   $(ENGINE_DIR)/build/matrix.pb.o \
+						   $(ENGINE_DIR)/build/label-block.pb.o \
 						   $(ENGINE_DIR)/build/io.o
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
 
 $(ENGINE_DIR)/bin/test-krao: $(ENGINE_DIR)/test/test-krao.cc \
 							 $(ENGINE_DIR)/build/block.pb.o \
 							 $(ENGINE_DIR)/build/matrix.pb.o \
+							 $(ENGINE_DIR)/build/label-block.pb.o \
 							 $(ENGINE_DIR)/build/krao.o
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
 
@@ -67,17 +69,23 @@ $(LAQ_DIR)/build/lex.yy.cc: $(LAQ_DIR)/src/laq-scanner.ll
 $(LAQ_DIR)/build:
 	mkdir -p $@ $(LAQ_DIR)/bin
 
-$(ENGINE_DIR)/bin/engine: $(ENGINE_DIR)/build/krao.o
-	$(CXX) $(CXXFLAGS) $< -o $@
-
 $(ENGINE_DIR)/build/krao.o: $(ENGINE_DIR)/src/krao.cc
 	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
+
 
 $(ENGINE_DIR)/build/block.pb.o: $(ENGINE_DIR)/src/block.pb.cc
 	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
 
 $(ENGINE_DIR)/src/block.pb.cc: $(ENGINE_DIR)/src/block.proto
 	protoc --cpp_out=engine --proto_path=engine $<
+
+
+$(ENGINE_DIR)/build/label-block.pb.o: $(ENGINE_DIR)/src/label-block.pb.cc
+	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
+
+$(ENGINE_DIR)/src/label-block.pb.cc: $(ENGINE_DIR)/src/label-block.proto
+	protoc --cpp_out=engine --proto_path=engine $<
+
 
 $(ENGINE_DIR)/build/matrix.pb.o: $(ENGINE_DIR)/src/matrix.pb.cc
 	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
@@ -90,13 +98,13 @@ $(ENGINE_DIR)/build:
 
 
 linter: $(LINTER)
-	$(LINTER) $(LAQ_DIR)/src/*.cc
-	$(LINTER) $(LAQ_DIR)/*/*.h
-	$(LINTER) $(LAQ_DIR)/test/*.cc
-	$(LINTER) $(ENGINE_DIR)/src/*.cc
-	$(LINTER) $(ENGINE_DIR)/*/*.h
-	$(LINTER) $(ENGINE_DIR)/test/*.cc
-	$(LINTER) queries/cpp/*.cc
+	@$(LINTER) $(LAQ_DIR)/src/*.cc \
+			   $(LAQ_DIR)/*/*.h \
+			   $(LAQ_DIR)/test/*.cc \
+			   $(ENGINE_DIR)/src/*.cc \
+			   $(ENGINE_DIR)/*/*.h \
+			   $(ENGINE_DIR)/test/*.cc \
+			   queries/cpp/*.cc
 
 .PHONY: all clean delete linter test
 	

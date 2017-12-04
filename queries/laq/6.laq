@@ -4,11 +4,11 @@
 
 A = filter( l.shipdate >= "1994-01-01" AND l.shipdate <= "1995-01-01" )   // 1 <-- #l
 B = filter( l.discount >= 0.05 AND l.discount <= 0.07 )                   // 1 <-- #l
-C = filter( l.quantity < 24 )                                             // 1 <-- #l
-D = hadamard( A, B )                                                      // 1 <-- #l
-E = hadamard( C, D )                                                      // 1 <-- #l
-F = map( l.extendedprice * l.discount )                                   // 1 <-- #l
-G = hadamard( E, F )                                                      // 1 <-- #l
+C = hadamard( A, B )                                                      // 1 <-- #l
+D = map( l.extendedprice * l.discount )                                   // 1 <-- #l
+E = filter( l.quantity < 24 )                                             // 1 <-- #l
+F = hadamard( D, E )                                                      // 1 <-- #l
+G = hadamard( C, F )                                                      // 1 <-- #l
 H = sum( G )                                                              // 1 <-- 1
 return ( H )                                                              // RESULT
 

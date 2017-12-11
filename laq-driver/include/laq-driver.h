@@ -53,6 +53,8 @@ class driver {
   // Provides parsed query in string format
   std::string getQuery();
 
+  // Return the number of expvars
+  size_t count_exp_vars();
   // Add variable contained in any expression
   void add_exp_var(const std::string& var);
   // Get variables of current expression and clear the temporary storage

@@ -6,61 +6,101 @@
  */
 #include "include/operators.h"
 
-inline bool filter_a(auto l_shipdate) {
-  return l.shipdate >= "1994-01-01" && l.shipdate <= "1995-01-01";
+#ifndef DATA_PATH
+  #define DATA_PATH "data"
+#endif
+
+inline bool filter_a(auto args) {
+  return args[0] >= "1994-01-01" && args[0] <= "1995-01-01";
 }
 
-inline bool filter_b(auto l_discount) {
-  return l_discount >= 0.05 && l_discount <= 0.07;
+inline bool filter_b(auto args) {
+  return args[0] >= 0.05 && args[0] <= 0.07;
 }
 
-inline bool filter_c(auto l_quantity) {
-  return l_quantity < 24;
+inline auto map_d(auto args) {
+  return args[0] * args[1];
 }
 
-inline auto map_f(auto l_extendedprice, auto l_discount) {
-  return l.extendedprice * l.discount;
+inline bool filter_e(auto args) {
+  return args[0] < 24;
 }
 
 int main() {
-  Matrix l_shipdate("data", "lineitem", "shipdate");
-  Matrix l_discount("data", "lineitem", "discount");
-  Matrix l_quantity("data", "lineitem", "quantity");
-  Matrix l_extendedprice("data/lineitem/extendedprice");
+  using google::protobuf::Arena::CreateMessage;
 
-  Matrix a, b, c, d, e, f, g, h;
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  google::protobuf::Arena arena;
+
+  engine::matrix *l_shipdate, *l_discount, *l_quantity, *l_extendedprice;
+  engine::matrix *a, *b, *c, *d, *e, *f, *g, *h;
+
+  l_shipdate = CreateMessage<engine::matrix>(&arena);
+  l_discount = CreateMessage<engine::matrix>(&arena);
+  l_quantity = CreateMessage<engine::matrix>(&arena);
+  l_extendedprice = CreateMessage<engine::matrix>(&arena);
+
+  a = CreateMessage<engine::matrix>(&arena);
+  b = CreateMessage<engine::matrix>(&arena);
+  c = CreateMessage<engine::matrix>(&arena);
+  d = CreateMessage<engine::matrix>(&arena);
+  e = CreateMessage<engine::matrix>(&arena);
+  f = CreateMessage<engine::matrix>(&arena);
+  g = CreateMessage<engine::matrix>(&arena);
+  h = CreateMessage<engine::matrix>(&arena);
+
+  sum_acc sum_h();
+
+  loadMatrix(l_shipdate, DATA_PATH, "tpc-h", "lineitem", "shipdate");
+  loadMatrix(l_discount, DATA_PATH, "tpc-h", "lineitem", "discount");
+  loadMatrix(l_quantity, DATA_PATH, "tpc-h", "lineitem", "quantity");
+  loadMatrix(l_extendedprice, DATA_PATH, "tpc-h", "lineitem", "extendedprice");
 
   for (int i = 0; i < l_shipdate.n_blocks; ++i) {
-    l_shipdate.load(i);
+
+    // A = filter( l.shipdate >= "1994-01-01" AND l.shipdate <= "1995-01-01" )
+    loadBlock(l_shipdate, DATA_PATH, &arena, i);
     filter(filter_a, l_shipdate.blocks[i], a.blocks[i]);
-    l_shipdate.delete(i);
+    delete_block(l_shipdate, i);
 
-    l_discount.load(i);
+    // B = filter( l.discount >= 0.05 AND l.discount <= 0.07 )
+    loadBlock(l_discount, DATA_PATH, &arena, i);
     filter(filter_b, l_discount.blocks[i], b.blocks[i]);
-    l_quantity.load(i);
+
+    // C = hadamard( A, B )
+    krao(a, b, c, 1, CSC = false, move = true);
+    delete_block(a, i);
+    delete_block(b, i);
+
+    // D = map( l.extendedprice * l.discount )
+    loadBlock(l_extendedprice, DATA_PATH, &arena, i);
+    map(map_d, d.blocks[i], l_extendedprice.blocks[i], l_discount.blocks[i]);
+    delete_block(l_extendedprice, i);
+    delete_block(l_discount, i);
+
+    // E = filter( l.quantity < 24 )
+    loadBlock(l_quantity, DATA_PATH, &arena, i);
     filter(filter_c, l_quantity.blocks[i], c.blocks[i]);
-    l_quantity.delete(i);
+    delete_block(l_quantity, i);
 
-    krao(a, b, d, 1, CSC = false, move = true);
-    a.delete(i);
-    b.delete(i);
+    // F = hadamard( D, E )
+    krao(d, e, f, 1, CSC = false, move = true);
+    delete_block(d, i);
+    delete_block(e, i);
 
-    krao(c, d, e, 1, CSC = false, move = true);
-    c.delete(i);
-    d.delete(i);
+    // G = hadamard( C, F )
+    krao(c, f, g, 1, CSC = false, move = true);
+    delete_block(c, i);
+    delete_block(f, i);
 
-    l_extendedprice.load(i);
-    map(map_f, f.blocks[i], l_extendedprice.blocks[i], l_discount.blocks[i]);
+    // H = sum( G )
+    sum(g, sum_h);
+    delete_block(g, i);
 
-    krao(e, f, g, 1, CSC = false, move = true);
-    c.delete(i);
-    d.delete(i);
   }
 
-  for (int i = 0; i < g.n_blocks; ++i) {
-    sum(g, h);
-    g.delete(i);
-  }
+  acc_to_matrix(sum_h, h);
 
   // Print or store H
 

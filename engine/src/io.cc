@@ -7,10 +7,11 @@ namespace engine {
 
 bool
 loadMatrix(matrix* m,
-           const std::string& database_path,
+           const std::string& data_path,
+           const std::string& database,
            const std::string& table,
            const std::string& column) {
-  m->set_database_path(database_path);
+  m->set_database(database);
   m->set_table(table);
   m->set_column(column);
   fstream input(database + "/" + table + "/" + column + "/meta.dat",
@@ -23,9 +24,13 @@ loadMatrix(matrix* m,
 }
 
 bool
-loadBlock(matrix* m, google::protobuf::Arena *arena, int idx) {
+loadBlock(matrix* m,
+          const std::string& data_path,
+          google::protobuf::Arena *arena,
+          int idx) {
   ostringstream str;
-  str << matrix->database_path() << "/"
+  str << data_path << "/"
+      << matrix->database() << "/"
       << matrix->table() << "/"
       << matrix->column() << "/blocks/"
       << idx << ".dat";
@@ -44,42 +49,41 @@ loadBlock(matrix* m, google::protobuf::Arena *arena, int idx) {
   }
 }
 
-bool
-importCSV(matrix* m,
-        google::protobuf::Arena *arena,
-        const std::string& file_path,
-        const std::string& database_path,
-        const std::string& table,
-        const std::string& column,
-        const std::string& table_pk = ""
-        const std::string& column_pk = "") {
+/*
+  bool
+  importCSV(matrix* m,
+          google::protobuf::Arena *arena,
+          const std::string& file_path,
+          const std::string& database,
+          const std::string& table,
+          const std::string& column,
+          const std::string& table_pk = ""
+          const std::string& column_pk = "") {
+    ifstream input(file_path);
 
-  ifstream input(file_path);
+    int nnz = 0;
 
-  int nnz = 0;
+    google::protobuf::Arena *arena,
+    block *b = google::protobuf::Arena::CreateMessage<block>(arena);
+    label_block *lb = google::protobuf::Arena::CreateMessage<label_block>(arena);
+    std::unordered_map<std::string, int> reverse_labels;
 
-  google::protobuf::Arena *arena,
-  block *b = google::protobuf::Arena::CreateMessage<block>(arena);
-  label_block *lb = google::protobuf::Arena::CreateMessage<label_block>(arena);
-  std::unordered_map<std::string, int> reverse_labels;
+    for (std::string line; std::getline(input, line); ++nnz) {
+      // row is zero if unexistant; index start at 1
+      int row = reverse_labels[line] - 1;
+      if (row < 0) {
+        row = nnz;
+        reverse_labels[row] = nnz + 1;
+        lb->add_value(line);
+      }
 
-  for (std::string line; std::getline(input, line); ++nnz) {
-    // row is zero if unexistant; index start at 1
-    int row = reverse_labels[line] - 1;
-    if (row < 0) {
-      row = nnz;
-      reverse_labels[row] = nnz + 1;
-      lb->add_value(line);
-    }
-
-    if(nnz % BLOCK_SIZE == 0) {
-    }
-
-      // create file block[nnz / BLOCK_SIZE]
-      ++block_count;
-      i=0;
+      if (nnz % BLOCK_SIZE == 0) {
+        // create file block[nnz / BLOCK_SIZE]
+        ++block_count;
+        i = 0;
+      }
     }
   }
-}
+*/
 
 }  // namespace engine

@@ -59,7 +59,7 @@ namespace laq { class driver; }
 %type <sval> unary_expression
 %type <sval> primary_expression
 %type <sval> function
-%type <sval> data_type
+%type <sval> literal
 
 %printer    { yyoutput  <<  *$$; } <sval>
 %destructor { delete $$; } <sval>
@@ -99,7 +99,7 @@ statement
                                                             delete $1;
                                                             delete $5;
                                                           }
-  | IDENTIFIER '=' MAP '(' inclusive_or_expression ')'    { if(driver->var_exists(*$1))
+  | IDENTIFIER '=' MAP '(' expression ')'                 { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             std::vector<std::string> expvars = driver->clear_exp_vars();
@@ -278,9 +278,12 @@ primary_expression
                                                           }
   | function                                              { $$ = $1; }
   | ident                                                 { driver->add_exp_var(*$1);
-                                                            $$ = $1;
+                                                            $$ = new std::string("args[" +
+                                                                    std::to_string(driver->count_exp_vars() - 1) +
+                                                                    "]");
+                                                            delete $1;
                                                           }
-  | data_type                                             { $$ = $1; }
+  | literal                                               { $$ = $1; }
   ;
 
 function
@@ -300,7 +303,7 @@ function
                                                           }
   ;
 
-data_type
+literal
   : STRING                                                { $$ = $1; }
   | INT                                                   { $$ = $1; }
   | FLOAT                                                 { $$ = $1; }

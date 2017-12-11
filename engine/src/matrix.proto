@@ -8,7 +8,7 @@ option cc_enable_arenas = true;
 
 message matrix {
   // matrix identifiers
-  string database_path = 1;
+  string database = 1;
   string table = 2;
   string column = 3;
 

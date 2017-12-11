@@ -69,9 +69,16 @@ driver::getQuery() {
   return laquery->getQuery();
 }
 
+size_t
+driver::count_exp_vars() {
+  return expvars.size();
+}
+
 void
 driver::add_exp_var(const std::string& var) {
-  expvars.push_back(var);
+  if (!(std::find(expvars.begin(), expvars.end(), var) != expvars.end())) {
+    expvars.push_back(var);
+  }
 }
 
 std::vector<std::string>

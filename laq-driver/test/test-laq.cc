@@ -10,13 +10,13 @@ TEST(laq_parser, q6) {
   laq::driver d;
   ASSERT_FALSE(d.parse("queries/laq/6.laq"));
   ASSERT_EQ(d.getQuery(),
-            "a=filter(l_shipdate>=\"1994-01-01\"&&l_shipdate<=\"1995-01-01\")\n"
-            "b=filter(l_discount>=0.05&&l_discount<=0.07)\n"
-            "c=filter(l_quantity<24)\n"
-            "d=hadamard(a,b)\n"
-            "e=hadamard(c,d)\n"
-            "f=map(l_extendedprice*l_discount)\n"
-            "g=hadamard(e,f)\n"
+            "a=filter(args[0]>=\"1994-01-01\"&&args[0]<=\"1995-01-01\")\n"
+            "b=filter(args[0]>=0.05&&args[0]<=0.07)\n"
+            "c=hadamard(a,b)\n"
+            "d=map(args[0]*args[1])\n"
+            "e=filter(args[0]<24)\n"
+            "f=hadamard(d,e)\n"
+            "g=hadamard(c,f)\n"
             "h=sum(g)\n"
             "return(h)\n");
 }

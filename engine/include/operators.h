@@ -8,8 +8,8 @@
 #define BLOCK_SIZE 1024
 #endif
 
-#include <string>
 #include <google/protobuf/arena.h>
+#include <string>
 #include "src/block.pb.h"
 #include "src/label-block.pb.h"
 #include "src/matrix.pb.h"
@@ -28,12 +28,12 @@ bool loadBlock(matrix* m,
                google::protobuf::Arena *arena,
                int idx);
 
-bool importCSV(matrix* m,
+/*bool importCSV(matrix* m,
                const std::string& file_path,
                const std::string& database_path,
                const std::string& table,
                const std::string& column);
-
+*/
 // csv import measure
 // csv import dimension
 // csv import fk

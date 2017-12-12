@@ -122,7 +122,10 @@ linter: $(LINTER)
 			   $(ENGINE_DIR)/test/*.cc \
 			   queries/cpp/*.cc
 
-.PHONY: all clean delete linter test
+count:
+	cloc engine laq-driver sql-driver data queries makefile
+
+.PHONY: all clean delete linter test count
 	
 	
 #a: b c

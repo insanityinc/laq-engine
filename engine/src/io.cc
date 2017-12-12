@@ -1,42 +1,74 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights Reserved.
+ * Copyright (c) 2017 Hubble83 Afonso. All rights Reserved.
  */
 #include "include/operators.h"
 
 namespace engine {
 
 bool
-loadMatrix(matrix* m,
-           const std::string& data_path,
-           const std::string& database,
-           const std::string& table,
-           const std::string& column) {
-  m->set_database(database);
-  m->set_table(table);
-  m->set_column(column);
-  fstream input(database + "/" + table + "/" + column + "/meta.dat",
+loadDatabase(database* db,
+             const std::string& data_path,
+             const std::string& database) {
+  fstream input(data_path + "/" + database + "/meta.dat",
                 ios::in | ios::binary);
-  if (!input || !m->ParseFromIstream(&input)) {
-    std::cerr << "Failed to parse matrix metadata." << std::endl;
+  if (!input || !db->ParseFromIstream(&input)) {
+    std::cerr << "Failed to parse database metadata." << std::endl;
     return false;
   }
   return true;
 }
 
+/*
+  bool
+  loadMatrix(database* db,
+             matrix* m,
+             const std::string& table,
+             const std::string& column) {
+    // TODO: Check column exists in database!!!
+    m->set_table(table);
+    m->set_column(column);
+    fstream input(db->data_path() + "/"
+                  + db->tbl_name() + "/"
+                  + table + "/"
+                  + column + "/meta.dat",
+                  ios::in | ios::binary);
+    if (!input || !m->ParseFromIstream(&input)) {
+      std::cerr << "Failed to parse matrix metadata." << std::endl;
+      return false;
+    }
+    return true;
+  }
+*/
+
+matrix*
+getMatrix(database* db,
+          const std::string& table,
+          const std::string& column) {
+  return &(db->tables()[table].columns[column]);
+}
+
 bool
-loadBlock(matrix* m,
-          const std::string& data_path,
+is_fk(database* db, const std::string& table, const std::string& column) {
+    return db->tables().find(table) != db->tables().end() &&
+      db->tables()[table].columns().find(column)
+      != db->tables()[table].columns().end();
+}
+
+bool
+loadBlock(database* db,
+          matrix* m,
           google::protobuf::Arena *arena,
           int idx) {
+  // TODO(Hubble83): Check column exists in db and idx is a valid block
   ostringstream str;
-  str << data_path << "/"
-      << matrix->database() << "/"
-      << matrix->table() << "/"
-      << matrix->column() << "/blocks/"
+  str << db->data_path() << "/"
+      << db->tbl_name() << "/"
+      << m->table() << "/"
+      << m->column() << "/blocks/"
       << idx << ".dat";
   std::string file_path = str.str();
 
-  block *b = google::protobuf::Arena::CreateMessage<block>(arena);
+  block* b = google::protobuf::Arena::CreateMessage<block>(arena);
 
   fstream input(file_path, ios::in | ios::binary);
   if (!input || !b->ParseFromIstream(&input)) {
@@ -47,6 +79,83 @@ loadBlock(matrix* m,
     (*map)[idx] = *b;
     return true;
   }
+}
+
+bool
+loadLabelBlock(database* db,
+               matrix* m,
+               google::protobuf::Arena *arena,
+               int idx) {
+  // TODO(Hubble83): Check column exists in db and idx is a valid label block
+  ostringstream str;
+  if ()
+  str << db->data_path() << "/"
+      << db->tbl_name() << "/"
+      << m->table() << "/"
+      << m->column() << "/blocks/"
+      << idx << ".dat";
+  std::string file_path = str.str();
+
+  block* b = google::protobuf::Arena::CreateMessage<block>(arena);
+
+  fstream input(file_path, ios::in | ios::binary);
+  if (!input || !b->ParseFromIstream(&input)) {
+    std::cerr << "Failed to parse block." << std::endl;
+    return false;
+  } else {
+    auto map = m->mutable_blocks();
+    (*map)[idx] = *b;
+    return true;
+  }
+}
+
+void
+createDatabase(database *db,
+               const std::string& data_path,
+               const std::string& database) {
+  db->set_data_path(data_path);
+  db->set_tbl_name(database);
+}
+
+void
+createTable(database* db,
+            const std::string& table,
+            const std::map<std::string, matrix_Type>& columns,
+            const std::string& pk,
+            const std::map<std::string,
+                           std::tuple<std::string, std::string>>& fks
+            google::protobuf::Arena *arena) {
+  table *new_table = google::protobuf::Arena::CreateMessage<table>(&arena);
+
+  auto tbl_cols = new_table->mutable_columns();
+  for (map<auto, auto>::iterator it = columns.begin();
+      it != columns.end(); ++it) {
+    matrix *m = google::protobuf::Arena::CreateMessage<matrix>(&arena);
+
+    matrix->set_nnz(0);
+    matrix->set_nrows(0);
+    matrix->set_ncols(0);
+    matrix->set_type(columns[it->first]);
+    matrix->set_table(table);
+    matrix->set_column(it->first);
+
+    (*tbl_cols)[it->first] = *m;
+  }
+
+  new_table->set_pk(pk);
+
+  auto tbl_fks = new_table->mutable_fks();
+  for (map<auto, auto>::iterator it = fks.begin(); it != fks.end(); ++it) {
+    label_path *lp = google::protobuf::Arena::CreateMessage<label_path>(&arena);
+
+    lp->set_l_table(std::get<0>(fks[it->first]));
+    lp->set_l_column(std::get<1>(fks[it->first]));
+
+    (*tbl_fks)[it->first] = *lp;
+  }
+
+  auto tables = db->mutable_tables();
+  (*tables)[table] = *new_table;
 }
 
 /*

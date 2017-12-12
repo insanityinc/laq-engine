@@ -58,7 +58,6 @@ int main() {
   loadMatrix(l_extendedprice, DATA_PATH, "tpc-h", "lineitem", "extendedprice");
 
   for (int i = 0; i < l_shipdate.n_blocks; ++i) {
-
     // A = filter( l.shipdate >= "1994-01-01" AND l.shipdate <= "1995-01-01" )
     loadBlock(l_shipdate, DATA_PATH, &arena, i);
     filter(filter_a, l_shipdate.blocks[i], a.blocks[i]);
@@ -97,7 +96,6 @@ int main() {
     // H = sum( G )
     sum(g, sum_h);
     delete_block(g, i);
-
   }
 
   acc_to_matrix(sum_h, h);

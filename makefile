@@ -10,7 +10,8 @@ GTEST_DIR =  lib/googletest/googletest/include
 all: $(LAQ_DIR)/build \
 	 $(ENGINE_DIR)/build \
 	 $(LAQ_DIR)/bin/test-laq \
-	 $(ENGINE_DIR)/bin/test-krao #\
+	 $(ENGINE_DIR)/bin/test-krao \
+	 $(ENGINE_DIR)/bin/test-filter #\
 	 $(ENGINE_DIR)/bin/test-io
 
 clean:
@@ -22,28 +23,40 @@ delete: clean
 test:
 	$(LAQ_DIR)/bin/test-laq
 	$(ENGINE_DIR)/bin/test-krao
+	$(ENGINE_DIR)/bin/test-filter
 
 $(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
 						   $(ENGINE_DIR)/build/block.pb.o \
-						   $(ENGINE_DIR)/build/matrix.pb.o \
 						   $(ENGINE_DIR)/build/label-block.pb.o \
-						   $(ENGINE_DIR)/build/io.o
+						   $(ENGINE_DIR)/build/database.pb.o \
+						   $(ENGINE_DIR)/build/io.o \
+						   libgtest.a
+	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(ENGINE_DIR) -lprotobuf
+
+$(ENGINE_DIR)/bin/test-filter: $(ENGINE_DIR)/test/test-filter.cc \
+							   $(ENGINE_DIR)/build/block.pb.o \
+							   $(ENGINE_DIR)/build/label-block.pb.o \
+							   $(ENGINE_DIR)/build/database.pb.o \
+							   $(ENGINE_DIR)/build/filter.o \
+							   libgtest.a
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
 
 $(ENGINE_DIR)/bin/test-krao: $(ENGINE_DIR)/test/test-krao.cc \
 							 $(ENGINE_DIR)/build/block.pb.o \
-							 $(ENGINE_DIR)/build/matrix.pb.o \
 							 $(ENGINE_DIR)/build/label-block.pb.o \
-							 $(ENGINE_DIR)/build/krao.o
-	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
+							 $(ENGINE_DIR)/build/database.pb.o \
+							 $(ENGINE_DIR)/build/krao.o \
+							 libgtest.a
+	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(ENGINE_DIR) -lprotobuf
 
 $(LAQ_DIR)/bin/test-laq: $(LAQ_DIR)/test/test-laq.cc \
 						 $(LAQ_DIR)/build/laq-parser.o \
 						 $(LAQ_DIR)/build/lex.yy.o \
 						 $(LAQ_DIR)/build/laq-driver.o \
 						 $(LAQ_DIR)/build/parsing-tree.o \
-						 $(LAQ_DIR)/build/laq-statement.o
-	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(LAQ_DIR)
+						 $(LAQ_DIR)/build/laq-statement.o \
+						 libgtest.a
+	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(LAQ_DIR)
 
 $(LAQ_DIR)/build/laq-parser.o: $(LAQ_DIR)/build/laq-parser.cc
 	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(LAQ_DIR)/build -o $@
@@ -69,6 +82,9 @@ $(LAQ_DIR)/build/lex.yy.cc: $(LAQ_DIR)/src/laq-scanner.ll
 $(LAQ_DIR)/build:
 	mkdir -p $@ $(LAQ_DIR)/bin
 
+$(ENGINE_DIR)/build/filter.o: $(ENGINE_DIR)/src/filter.cc
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
+
 $(ENGINE_DIR)/build/krao.o: $(ENGINE_DIR)/src/krao.cc
 	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
 
@@ -87,10 +103,10 @@ $(ENGINE_DIR)/src/label-block.pb.cc: $(ENGINE_DIR)/src/label-block.proto
 	protoc --cpp_out=engine --proto_path=engine $<
 
 
-$(ENGINE_DIR)/build/matrix.pb.o: $(ENGINE_DIR)/src/matrix.pb.cc
+$(ENGINE_DIR)/build/database.pb.o: $(ENGINE_DIR)/src/database.pb.cc
 	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
 
-$(ENGINE_DIR)/src/matrix.pb.cc: $(ENGINE_DIR)/src/matrix.proto
+$(ENGINE_DIR)/src/database.pb.cc: $(ENGINE_DIR)/src/database.proto
 	protoc --cpp_out=engine --proto_path=engine $<
 
 $(ENGINE_DIR)/build:

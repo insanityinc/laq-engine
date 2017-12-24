@@ -8,12 +8,36 @@
 #include <google/protobuf/arena.h>
 #include "include/operators.h"
 
-bool f_measure(auto arg) {
-  return arg > 2;
+auto f_map(std::vector<auto> args) {
+  return args[0] + args[1] * 10;
 }
 
-bool f_dimension(auto arg) {
-  return arg == "B";
+bool f_measure(std::vector<auto> args) {
+  return args[0] > 2;
+}
+
+bool f_dimension(std::vector<auto> args) {
+  return args[0] == "B";
+}
+
+TEST(map, simple) {
+  engine::block arg0, arg1, res, out;
+
+  std::vector<float> a0 = {1, 7, 3, 2.1, 8, 1, 3, 3.5, 1.2, 1};
+  for (auto& v : a0)
+    arg0.add_values(v);
+
+  std::vector<float> a1 = {0, 3, 2, 0, 5, 4, 1, 2, 0.5, 0};
+  for (auto& v : a1)
+    arg1.add_values(v);
+
+  std::vector<float> op = {1, 37, 23, 2.1, 58, 41, 13, 23.5, 6.2, 1};
+  for (auto& c : op)
+    out.add_values(c);
+
+  std::vector<engine::block*> in = {&arg0, &arg1};
+  map(in, &res, f_map);
+  ASSERT_TRUE(google::protobuf::util::MessageDifferencer::Equals(res, out));
 }
 
 TEST(filter, measure) {
@@ -27,7 +51,7 @@ TEST(filter, measure) {
   for (auto& c : fcolumns)
     out.add_columns(c);
 
-  filter(measure, &res, &f_measure);
+  filter(measure, &res, f_measure);
   ASSERT_TRUE(google::protobuf::util::MessageDifferencer::Equals(res, out));
 }
 

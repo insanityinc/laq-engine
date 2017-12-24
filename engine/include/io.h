@@ -12,28 +12,11 @@
 #include <map>
 #include <string>
 #include <tuple>
-#include <vector>
 #include "src/block.pb.h"
 #include "src/label-block.pb.h"
 #include "src/database.pb.h"
 
 namespace engine {
-
-void krao(block* A, block* B, block* C,
-          int rows_A = 1, bool CSC = false , bool move = false);
-
-// In is either a block* (filter measure) or a label_block* (filter dimension)
-void filter(const block& in,
-            block* out,
-            bool(*f)(std::vector<float>));
-
-void filter(const label_block& in,
-            block* out,
-            bool(*f)(std::vector<std::string>));
-
-void map(const std::vector<block*>& in,
-         block* out,
-         float(*f)(std::vector<float>));
 
 bool loadDatabase(database* db,
                   const std::string& data_path,
@@ -69,18 +52,10 @@ void createTable(database* db,
 
 void insertValue(matrix* m, auto value);
 
-/*bool importCSV(matrix* m,
-               const std::string& file_path,
-               const std::string& database_path,
-               const std::string& table,
-               const std::string& column);
-*/
-// csv import measure
-// csv import dimension
-// csv import fk
 
 
-bool storeMatrix(matrix* m);
+
+bool storeDatabase(matrix* m);
 bool storeBlock(matrix* m, int idx);
 
 }  // namespace engine

@@ -1,6 +1,7 @@
 CXX = g++-7.2
-CXXFLAGS = -O2 -std=c++14 -pedantic -Wall -Wextra -Wshadow -Wconversion
-#-Werror
+CXXFLAGS = -O2 -std=c++14 -Wall -Wextra -Wshadow -Wconversion \
+-Wno-unused-parameter
+#-pedantic -Werror
 
 LAQ_DIR = laq-driver
 ENGINE_DIR = engine
@@ -11,7 +12,7 @@ all: $(LAQ_DIR)/build \
 	 $(ENGINE_DIR)/build \
 	 $(LAQ_DIR)/bin/test-laq \
 	 $(ENGINE_DIR)/bin/test-krao \
-	 $(ENGINE_DIR)/bin/test-filter #\
+	 $(ENGINE_DIR)/bin/test-map-filter #\
 	 $(ENGINE_DIR)/bin/test-io
 
 clean:
@@ -23,7 +24,7 @@ delete: clean
 test:
 	$(LAQ_DIR)/bin/test-laq
 	$(ENGINE_DIR)/bin/test-krao
-	$(ENGINE_DIR)/bin/test-filter
+	$(ENGINE_DIR)/bin/test-map-filter
 
 $(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
 						   $(ENGINE_DIR)/build/block.pb.o \
@@ -33,10 +34,11 @@ $(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
 						   libgtest.a
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(ENGINE_DIR) -lprotobuf
 
-$(ENGINE_DIR)/bin/test-filter: $(ENGINE_DIR)/test/test-filter.cc \
+$(ENGINE_DIR)/bin/test-map-filter: $(ENGINE_DIR)/test/test-map-filter.cc \
 							   $(ENGINE_DIR)/build/block.pb.o \
 							   $(ENGINE_DIR)/build/label-block.pb.o \
 							   $(ENGINE_DIR)/build/database.pb.o \
+							   $(ENGINE_DIR)/build/map.o \
 							   $(ENGINE_DIR)/build/filter.o \
 							   libgtest.a
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
@@ -81,6 +83,9 @@ $(LAQ_DIR)/build/lex.yy.cc: $(LAQ_DIR)/src/laq-scanner.ll
 
 $(LAQ_DIR)/build:
 	mkdir -p $@ $(LAQ_DIR)/bin
+
+$(ENGINE_DIR)/build/map.o: $(ENGINE_DIR)/src/map.cc
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
 
 $(ENGINE_DIR)/build/filter.o: $(ENGINE_DIR)/src/filter.cc
 	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@

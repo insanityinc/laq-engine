@@ -11,7 +11,7 @@
 #endif
 
 inline bool filter_a(auto args) {
-  return args[0] >= "1994-01-01" && args[0] <= "1995-01-01";
+  return args[0] >= "1994-01-01" && args[0] < "1995-01-01";
 }
 
 inline bool filter_b(auto args) {

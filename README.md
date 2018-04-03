@@ -16,28 +16,12 @@ git clone https://github.com/Hubble83/dbms.git
 
 Install flex and bison (tested with **Flex 2.6.4** and **Bison 3.0.4**).
 
-Install Google Protocol Buffers (follow Google tutorial or use this commands)
+Download Cereal
 
 ```
 mkdir dbms/lib
 cd dbms/lib
-git clone https://github.com/google/protobuf.git
-cd protobuf
-sudo apt-get install autoconf automake libtool curl make g++ unzip
-./autogen.sh
-./configure
-make
-make check
-sudo make install
-sudo ldconfig
-```
-
-[Optional] Google cpplint used to check code syntax
-
-```
-mkdir dbms/lib
-cd dbms/lib
-git clone https://github.com/google/styleguide.git
+https://github.com/USCiLab/cereal.git
 ```
 
 [Optional] Google test used for unit testing, use your C++ compiler
@@ -128,6 +112,6 @@ See also the list of [contributors](https://github.com/Hubble83/dbms/contributor
 
 ## Acknowledgments
 
-* Bruno M. G. Ribeiro
-* João P. A. Fernandes
+* Bruno Ribeiro
+* João Fernandes
 

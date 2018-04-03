@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights reserved.
+ * Copyright (c) 2018 João Afonso. All rights reserved.
  */
-#include "include/laq-driver.h"
-#include "src/parsing-tree.h"
+#include "include/laq_driver.hpp"
+#include "src/parsing_tree.hpp"
 
 namespace laq {
 

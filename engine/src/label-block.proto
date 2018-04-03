@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package engine;
-
-option cc_enable_arenas = true;
-
-message label_block {
-  repeated string values = 1;
-}

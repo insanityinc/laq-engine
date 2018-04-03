@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights reserved.
+ * Copyright (c) 2018 João Afonso. All rights reserved.
  */
 %{ /* -*- C++ -*- */
 #include <cstdlib>
 #include <cerrno>
 #include <climits>
 #include <string>
-#include "include/laq-driver.h"
+#include "include/laq_driver.hpp"
 
 /* Work around an incompatibility in flex (at least versions
    2.5.31 through 2.5.33): it generates code that does
@@ -27,7 +27,7 @@ blank                   [ \t\r]+
 symbols                 [=,&<>+/%~\(\)\|\^\-\*\.]
 
 filter                  [fF][iI][lL][tT][eE][rR]
-map                     [mM][aA][pP]
+lift                    [lL][iI][fF][tT]
 dot                     [dD][oO][tT]
 krao                    [kK][rR][aA][oO]
 hadamard                [hH][aA][dD][aA][mM][aA][rR][dD]
@@ -82,7 +82,7 @@ not                     ([nN][oO][tT]|!)
 <INITIAL>{symbols}          { return yy::laq_parser::token_type( yytext[0] ); }
 
 <INITIAL>{filter}           { return token::FILTER; }
-<INITIAL>{map}              { return token::MAP; }
+<INITIAL>{lift}              { return token::LIFT; }
 <INITIAL>{dot}              { return token::DOT; }
 <INITIAL>{krao}             { return token::KRAO; }
 <INITIAL>{hadamard}         { return token::HADAMARD; }

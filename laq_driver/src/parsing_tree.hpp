@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights reserved.
+ * Copyright (c) 2018 João Afonso. All rights reserved.
  */
 #ifndef LAQ_DRIVER_SRC_PARSING_TREE_H_
 #define LAQ_DRIVER_SRC_PARSING_TREE_H_
@@ -7,7 +7,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include "include/laq-driver.h"
+#include "include/laq_driver.hpp"
 
 namespace laq {
 

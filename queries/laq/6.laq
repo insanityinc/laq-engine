@@ -2,18 +2,24 @@
  * Linear Algebra Query 6
  */
 
-A = filter( l.shipdate >= "1994-01-01" AND l.shipdate < "1995-01-01" )   // 1 <-- #l
-B = filter( l.discount >= 0.05 AND l.discount <= 0.07 )                   // 1 <-- #l
-C = hadamard( A, B )                                                      // 1 <-- #l
-D = map( l.extendedprice * l.discount )                                   // 1 <-- #l
-E = filter( l.quantity < 24 )                                             // 1 <-- #l
-F = hadamard( D, E )                                                      // 1 <-- #l
-G = hadamard( C, F )                                                      // 1 <-- #l
+A = filter( lineitem.shipdate >= "1994-01-01" AND lineitem.shipdate < "1995-01-01" )	  // 1 <-- #l
+B = filter( lineitem.discount >= 0.05 AND lineitem.discount <= 0.07 )                   // 1 <-- #l
+C = filter( lineitem.quantity < 24 )                                             // 1 <-- #l
+D = hadamard( A, B )                                                      // 1 <-- #l
+E = hadamard( C, D )                                                      // 1 <-- #l
+F = lift( lineitem.extendedprice * lineitem.discount )                                  // 1 <-- #l
+G = hadamard( E, F )                                                      // 1 <-- #l
 H = sum( G )                                                              // 1 <-- 1
 return ( H )                                                              // RESULT
 
+//A = filter( l.shipdate >= "1994-01-01" AND l.shipdate < "1995-01-01" )                      // 1 <-- #l
+//B = filter( A, l.discount >= 0.05 AND l.discount <= 0.07 AND l.quantity < 24 )              // 1 <-- #l
+//C = lift( B, l.extendedprice * l.discount )                                                 // 1 <-- #l
+//D = sum( C )                                                                                // 1 <-- 1
+//return ( D )                                                                                // RESULT
+
 /** Expected result:
   *
-  * REVENUE 
-  * 123141078.23 
+  * REVENUE
+  * 123141078.23
   */

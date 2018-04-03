@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights reserved.
+ * Copyright (c) 2018 João Afonso. All rights reserved.
  */
 #ifndef LAQ_DRIVER_SRC_LAQ_STATEMENT_H_
 #define LAQ_DRIVER_SRC_LAQ_STATEMENT_H_
 #include <string>
 #include <vector>
-#include "src/parsing-tree.h"
+#include "src/parsing_tree.hpp"
 
 namespace laq {
 

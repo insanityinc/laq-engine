@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights reserved.
+ * Copyright (c) 2018 João Afonso. All rights reserved.
  */
 %skeleton "lalr1.cc" /* -*- C++ -*- */
 %require "2.6.90.8-d4fe"
@@ -31,11 +31,11 @@ namespace laq { class driver; }
 }
 
 %code {
-# include "include/laq-driver.h"
+# include "include/laq_driver.hpp"
 }
 
 %token END 0 "end of file"
-%token FILTER MAP DOT KRAO HADAMARD
+%token FILTER LIFT DOT KRAO HADAMARD
 %token COUNT SUM AVG MIN MAX
 %token POWER EXP SQRT MATCH
 %token OR AND EQ NE LE GE LEFT RIGHT NOT
@@ -99,11 +99,11 @@ statement
                                                             delete $1;
                                                             delete $5;
                                                           }
-  | IDENTIFIER '=' MAP '(' expression ')'                 { if(driver->var_exists(*$1))
+  | IDENTIFIER '=' LIFT '(' expression ')'                 { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             std::vector<std::string> expvars = driver->clear_exp_vars();
-                                                            driver->insert_statement(*$1, "map", expvars, *$5);
+                                                            driver->insert_statement(*$1, "lift", expvars, *$5);
                                                             delete $1;
                                                             delete $5;
                                                           }

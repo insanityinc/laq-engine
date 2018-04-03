@@ -6,7 +6,7 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "build/laq-parser.hh"
+#include "build/laq_parser.hpp"
 
 // Tell Flex the lexer's prototype ...
 #define YY_DECL                                 \

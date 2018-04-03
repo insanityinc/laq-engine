@@ -1,140 +1,140 @@
 CXX = g++-7.2
-CXXFLAGS = -O2 -std=c++14 -Wall -Wextra -Wshadow -Wconversion \
--Wno-unused-parameter
-#-pedantic -Werror
+CXXFLAGS = -g -O2 -std=c++11
+#-Wall -Wextra -Wshadow -Wconversion -pedantic -Werror
+#-Wno-unused-parameter
 
-LAQ_DIR = laq-driver
+DBGEN_DATA = -D data/dbgen
+LA_DATA = -D data/la
+
+LAQ_DIR = laq_driver
 ENGINE_DIR = engine
 LINTER = lib/styleguide/cpplint/cpplint.py
-GTEST_DIR =  lib/googletest/googletest/include
+GTEST_DIR = lib/googletest/googletest/include
+CEREAL = lib/cereal/include
 
-all: $(LAQ_DIR)/build \
+ENGINE_OBJ = $(ENGINE_DIR)/build/block.o \
+			 $(ENGINE_DIR)/build/dot.o \
+			 $(ENGINE_DIR)/build/filter.o \
+			 $(ENGINE_DIR)/build/fold.o \
+			 $(ENGINE_DIR)/build/krao.o \
+			 $(ENGINE_DIR)/build/lift.o \
+			 $(ENGINE_DIR)/build/matrix.o \
+			 $(ENGINE_DIR)/build/database.o
+
+.PHONY: all clean delete linter test count
+
+all: $(ENGINE_DIR)/build $(ENGINE_DIR)/bin/q6 $(ENGINE_DIR)/bin/load
+
+#all: $(LAQ_DIR)/build \
 	 $(ENGINE_DIR)/build \
-	 $(LAQ_DIR)/bin/test-laq \
-	 $(ENGINE_DIR)/bin/test-krao \
-	 $(ENGINE_DIR)/bin/test-map-filter #\
-	 $(ENGINE_DIR)/bin/test-io
+	 $(LAQ_DIR)/bin/test_laq \
+	 $(ENGINE_DIR)/bin/q6
 
 clean:
-	rm -fr $(LAQ_DIR)/build $(ENGINE_DIR)/build $(ENGINE_DIR)/src/*.pb.*
+	rm -fr $(LAQ_DIR)/build $(ENGINE_DIR)/build
 
 delete: clean
-	rm -fr $(LAQ_DIR)/bin $(ENGINE_DIR)/bin
+	rm -fr $(LAQ_DIR)/bin $(ENGINE_DIR)/bin data/la/*
+
+linter: $(LINTER)
+	@$(LINTER) $(LAQ_DIR)/src/*.cpp \
+			   $(LAQ_DIR)/*/*.hpp \
+			   $(LAQ_DIR)/test/*.cpp \
+			   $(ENGINE_DIR)/src/*.cpp \
+			   $(ENGINE_DIR)/*/*.hpp \
+			   $(ENGINE_DIR)/test/*.cpp \
+			   queries/cpp/*.cpp
 
 test:
-	$(LAQ_DIR)/bin/test-laq
-	$(ENGINE_DIR)/bin/test-krao
-	$(ENGINE_DIR)/bin/test-map-filter
+	$(LAQ_DIR)/bin/test_laq
 
-$(ENGINE_DIR)/bin/test-io: $(ENGINE_DIR)/test/test-io.cc \
-						   $(ENGINE_DIR)/build/block.pb.o \
-						   $(ENGINE_DIR)/build/label-block.pb.o \
-						   $(ENGINE_DIR)/build/database.pb.o \
-						   $(ENGINE_DIR)/build/io.o \
-						   libgtest.a
-	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(ENGINE_DIR) -lprotobuf
+count:
+	cloc engine laq_driver sql_driver data queries makefile
 
-$(ENGINE_DIR)/bin/test-map-filter: $(ENGINE_DIR)/test/test-map-filter.cc \
-							   $(ENGINE_DIR)/build/block.pb.o \
-							   $(ENGINE_DIR)/build/label-block.pb.o \
-							   $(ENGINE_DIR)/build/database.pb.o \
-							   $(ENGINE_DIR)/build/map.o \
-							   $(ENGINE_DIR)/build/filter.o \
-							   libgtest.a
-	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ libgtest.a -o $@ -I $(ENGINE_DIR) -lprotobuf
 
-$(ENGINE_DIR)/bin/test-krao: $(ENGINE_DIR)/test/test-krao.cc \
-							 $(ENGINE_DIR)/build/block.pb.o \
-							 $(ENGINE_DIR)/build/label-block.pb.o \
-							 $(ENGINE_DIR)/build/database.pb.o \
-							 $(ENGINE_DIR)/build/krao.o \
-							 libgtest.a
-	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(ENGINE_DIR) -lprotobuf
-
-$(LAQ_DIR)/bin/test-laq: $(LAQ_DIR)/test/test-laq.cc \
-						 $(LAQ_DIR)/build/laq-parser.o \
+$(LAQ_DIR)/bin/test_laq: $(LAQ_DIR)/test/test_laq.cpp \
+						 $(LAQ_DIR)/build/laq_parser.o \
 						 $(LAQ_DIR)/build/lex.yy.o \
-						 $(LAQ_DIR)/build/laq-driver.o \
-						 $(LAQ_DIR)/build/parsing-tree.o \
-						 $(LAQ_DIR)/build/laq-statement.o \
+						 $(LAQ_DIR)/build/laq_driver.o \
+						 $(LAQ_DIR)/build/parsing_tree.o \
+						 $(LAQ_DIR)/build/laq_statement.o \
 						 libgtest.a
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(LAQ_DIR)
 
-$(LAQ_DIR)/build/laq-parser.o: $(LAQ_DIR)/build/laq-parser.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(LAQ_DIR)/build -o $@
 
-$(LAQ_DIR)/build/lex.yy.o: $(LAQ_DIR)/build/lex.yy.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
 
-$(LAQ_DIR)/build/laq-driver.o: $(LAQ_DIR)/src/laq-driver.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+$(ENGINE_DIR)/bin/q6: queries/cpp/6new.cc $(ENGINE_OBJ)
+	$(CXX) $(CXXFLAGS) -I $(ENGINE_DIR) -o $@ $^
 
-$(LAQ_DIR)/build/parsing-tree.o: $(LAQ_DIR)/src/parsing-tree.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+$(ENGINE_DIR)/bin/load: data/tpch_createDB.cpp $(ENGINE_OBJ)
+	$(CXX) $(CXXFLAGS) -I $(ENGINE_DIR) -o $@ $^
 
-$(LAQ_DIR)/build/laq-statement.o: $(LAQ_DIR)/src/laq-statement.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
 
-$(LAQ_DIR)/build/laq-parser.cc: $(LAQ_DIR)/src/laq-parser.yy
-	bison -o $@ -d $<
-
-$(LAQ_DIR)/build/lex.yy.cc: $(LAQ_DIR)/src/laq-scanner.ll
-	flex -o $@ $<
+########## Needed directories ##########
 
 $(LAQ_DIR)/build:
 	mkdir -p $@ $(LAQ_DIR)/bin
-
-$(ENGINE_DIR)/build/map.o: $(ENGINE_DIR)/src/map.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
-
-$(ENGINE_DIR)/build/filter.o: $(ENGINE_DIR)/src/filter.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
-
-$(ENGINE_DIR)/build/krao.o: $(ENGINE_DIR)/src/krao.cc
-	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -o $@
-
-
-$(ENGINE_DIR)/build/block.pb.o: $(ENGINE_DIR)/src/block.pb.cc
-	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
-
-$(ENGINE_DIR)/src/block.pb.cc: $(ENGINE_DIR)/src/block.proto
-	protoc --cpp_out=engine --proto_path=engine $<
-
-
-$(ENGINE_DIR)/build/label-block.pb.o: $(ENGINE_DIR)/src/label-block.pb.cc
-	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
-
-$(ENGINE_DIR)/src/label-block.pb.cc: $(ENGINE_DIR)/src/label-block.proto
-	protoc --cpp_out=engine --proto_path=engine $<
-
-
-$(ENGINE_DIR)/build/database.pb.o: $(ENGINE_DIR)/src/database.pb.cc
-	$(CXX) $(CXXFLAGS) -c $< -I engine -o $@
-
-$(ENGINE_DIR)/src/database.pb.cc: $(ENGINE_DIR)/src/database.proto
-	protoc --cpp_out=engine --proto_path=engine $<
 
 $(ENGINE_DIR)/build:
 	mkdir -p $@ $(ENGINE_DIR)/bin
 
 
-linter: $(LINTER)
-	@$(LINTER) $(LAQ_DIR)/src/*.cc \
-			   $(LAQ_DIR)/*/*.h \
-			   $(LAQ_DIR)/test/*.cc \
-			   $(ENGINE_DIR)/src/*.cc \
-			   $(ENGINE_DIR)/*/*.h \
-			   $(ENGINE_DIR)/test/*.cc \
-			   queries/cpp/*.cc
+########## LAQ parser objects ##########
 
-count:
-	cloc engine laq-driver sql-driver data queries makefile
+$(LAQ_DIR)/build/laq_parser.o: $(LAQ_DIR)/build/laq_parser.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(LAQ_DIR)/build -o $@
 
-.PHONY: all clean delete linter test count
-	
-	
+$(LAQ_DIR)/build/lex.yy.o: $(LAQ_DIR)/build/lex.yy.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+
+$(LAQ_DIR)/build/laq_driver.o: $(LAQ_DIR)/src/laq_driver.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+
+$(LAQ_DIR)/build/parsing_tree.o: $(LAQ_DIR)/src/parsing_tree.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+
+$(LAQ_DIR)/build/laq_statement.o: $(LAQ_DIR)/src/laq_statement.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+
+
+########## LAQ parser flex and bison ##########
+
+$(LAQ_DIR)/build/laq_parser.cpp: $(LAQ_DIR)/src/laq_parser.yy
+	bison -o $@ -d $<
+
+$(LAQ_DIR)/build/lex.yy.cpp: $(LAQ_DIR)/src/laq_scanner.ll
+	flex -o $@ $<
+
+
+########## Engine objects ##########
+
+$(ENGINE_DIR)/build/block.o: $(ENGINE_DIR)/src/block.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+$(ENGINE_DIR)/build/dot.o: $(ENGINE_DIR)/src/dot.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+$(ENGINE_DIR)/build/filter.o: $(ENGINE_DIR)/src/filter.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+$(ENGINE_DIR)/build/fold.o: $(ENGINE_DIR)/src/fold.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+$(ENGINE_DIR)/build/krao.o: $(ENGINE_DIR)/src/krao.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+$(ENGINE_DIR)/build/lift.o: $(ENGINE_DIR)/src/lift.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+$(ENGINE_DIR)/build/matrix.o: $(ENGINE_DIR)/src/matrix.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+$(ENGINE_DIR)/build/database.o: $(ENGINE_DIR)/src/database.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+
 #a: b c
-#	gcc -o $@ $^
+#   gcc -o $@ $^
 #$@ = a
 #$< = b
 #$^ = b c

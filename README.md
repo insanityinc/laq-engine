@@ -21,7 +21,7 @@ Download Cereal
 ```
 mkdir dbms/lib
 cd dbms/lib
-https://github.com/USCiLab/cereal.git
+git clone https://github.com/USCiLab/cereal.git
 ```
 
 [Optional] Google test used for unit testing, use your C++ compiler

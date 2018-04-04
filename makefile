@@ -1,6 +1,5 @@
-CXX = g++-7.2
-CXXFLAGS = -g -O2 -std=c++11
-#-Wall -Wextra -Wshadow -Wconversion -pedantic -Werror
+CXX = g++
+CXXFLAGS = -O2 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic -Werror
 #-Wno-unused-parameter
 
 DBGEN_DATA = -D data/dbgen

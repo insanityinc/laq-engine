@@ -34,4 +34,5 @@
 build
 bin
 lib
-data
+data/la
+data/dbgen

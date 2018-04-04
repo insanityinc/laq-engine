@@ -5,6 +5,8 @@
  * TPC-H Query 6
  */
 #include <iostream>
+#include <string>
+#include <vector>
 #include "include/block.hpp"
 #include "include/dot.hpp"
 #include "include/filter.hpp"
@@ -38,23 +40,37 @@ inline Decimal lift_f(std::vector<Decimal> args) {
 }
 
 int main() {
-  engine::Bitmap *lineitem_shipdate = new engine::Bitmap(DATA_PATH, DATABASE, "lineitem", "shipdate");
-  engine::DecimalVector *lineitem_discount = new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "discount");
-  engine::DecimalVector *lineitem_quantity = new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "quantity");
-  engine::DecimalVector *lineitem_extendedprice = new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "extendedprice");
+  engine::Bitmap *lineitem_shipdate =
+    new engine::Bitmap(DATA_PATH, DATABASE, "lineitem", "shipdate");
+  engine::DecimalVector *lineitem_discount =
+    new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "discount");
+  engine::DecimalVector *lineitem_quantity =
+    new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "quantity");
+  engine::DecimalVector *lineitem_extendedprice =
+    new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "extendedprice");
 
-  engine::FilteredBitVector *a_pred = new engine::FilteredBitVector(lineitem_shipdate->nLabelBlocks);
-  engine::FilteredBitVector *a = new engine::FilteredBitVector(lineitem_shipdate->nBlocks);
-  engine::FilteredBitVector *b = new engine::FilteredBitVector(lineitem_discount->nBlocks);
-  engine::FilteredBitVector *c = new engine::FilteredBitVector(lineitem_quantity->nBlocks);
-  engine::FilteredBitVector *d = new engine::FilteredBitVector(a->nBlocks);
-  engine::FilteredBitVector *e = new engine::FilteredBitVector(c->nBlocks);
-  engine::DecimalVector *f = new engine::DecimalVector(lineitem_extendedprice->nBlocks);
-  engine::FilteredDecimalVector *g = new engine::FilteredDecimalVector(c->nBlocks);
-  Decimal *h = new Decimal();
+  engine::FilteredBitVector *a_pred =
+    new engine::FilteredBitVector(lineitem_shipdate->nLabelBlocks);
+  engine::FilteredBitVector *a =
+    new engine::FilteredBitVector(lineitem_shipdate->nBlocks);
+  engine::FilteredBitVector *b =
+    new engine::FilteredBitVector(lineitem_discount->nBlocks);
+  engine::FilteredBitVector *c =
+    new engine::FilteredBitVector(lineitem_quantity->nBlocks);
+  engine::FilteredBitVector *d =
+    new engine::FilteredBitVector(a->nBlocks);
+  engine::FilteredBitVector *e =
+    new engine::FilteredBitVector(c->nBlocks);
+  engine::DecimalVector *f =
+    new engine::DecimalVector(lineitem_extendedprice->nBlocks);
+  engine::FilteredDecimalVector *g =
+    new engine::FilteredDecimalVector(c->nBlocks);
+  Decimal *h =
+    new Decimal();
 
   for (Size i = 0; i < lineitem_shipdate->nLabelBlocks; ++i) {
-    // A = filter( lineitem.shipdate >= "1994-01-01" AND lineitem.shipdate < "1995-01-01" )
+    // A = filter( lineitem.shipdate >= "1994-01-01"
+    //             AND lineitem.shipdate < "1995-01-01" )
     lineitem_shipdate->loadLabelBlock(i);
     a_pred->blocks[i] = new engine::FilteredBitVectorBlock();
     filter(filter_a, {*(lineitem_shipdate->labels[i])}, a_pred->blocks[i]);
@@ -64,11 +80,12 @@ int main() {
   }
 
   for (Size i = 0; i < lineitem_shipdate->nBlocks; ++i) {
-    // A = filter( lineitem.shipdate >= "1994-01-01" AND lineitem.shipdate < "1995-01-01" )
+    // A = filter( lineitem.shipdate >= "1994-01-01"
+    //             AND lineitem.shipdate < "1995-01-01" )
     lineitem_shipdate->loadBlock(i);
     // Change this to a->initBlock(i);
     a->blocks[i] = new engine::FilteredBitVectorBlock();
-    dot(*a_pred, *(lineitem_shipdate->blocks[i]), a->blocks[i] );
+    dot(*a_pred, *(lineitem_shipdate->blocks[i]), a->blocks[i]);
     lineitem_shipdate->deleteBlock(i);
 
     // std::cout << "A_nnz += " << a->blocks[i]->nnz << std::endl;
@@ -76,7 +93,7 @@ int main() {
     // B = filter( lineitem.discount >= 0.05 AND lineitem.discount <= 0.07 )
     lineitem_discount->loadBlock(i);
     b->blocks[i] = new engine::FilteredBitVectorBlock();
-    filter(filter_b, {*(lineitem_discount->blocks[i])}, b->blocks[i] );
+    filter(filter_b, {*(lineitem_discount->blocks[i])}, b->blocks[i]);
 
 
     // std::cout << "B_nnz += " << b->blocks[i]->nnz << std::endl;
@@ -84,7 +101,7 @@ int main() {
     // C = filter( lineitem.quantity < 24 )
     lineitem_quantity->loadBlock(i);
     c->blocks[i] = new engine::FilteredBitVectorBlock();
-    filter(filter_c, {*(lineitem_quantity->blocks[i])}, c->blocks[i] );
+    filter(filter_c, {*(lineitem_quantity->blocks[i])}, c->blocks[i]);
     lineitem_quantity->deleteBlock(i);
 
     // std::cout << "C_nnz += " << c->blocks[i]->nnz << std::endl;
@@ -110,7 +127,10 @@ int main() {
     // F = lift( lineitem.extendedprice * lineitem.discount )
     lineitem_extendedprice->loadBlock(i);
     f->blocks[i] = new engine::DecimalVectorBlock();
-    lift(lift_f, {*(lineitem_discount->blocks[i]), *(lineitem_extendedprice->blocks[i])}, f->blocks[i]);
+    lift(lift_f,
+         {*(lineitem_discount->blocks[i]),
+         *(lineitem_extendedprice->blocks[i])},
+         f->blocks[i]);
     lineitem_extendedprice->deleteBlock(i);
     lineitem_discount->deleteBlock(i);
 

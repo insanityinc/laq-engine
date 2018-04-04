@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2018 João Afonso. All rights reserved.
  */
+#include <string>
+#include <vector>
 #include "include/laq_driver.hpp"
 #include "src/parsing_tree.hpp"
 

@@ -2,6 +2,7 @@
  * Copyright (c) 2018 João Afonso. All rights Reserved.
  */
 #include "include/lift.hpp"
+#include <vector>
 
 namespace engine {
 
@@ -26,8 +27,8 @@ void lift(Decimal(*f)(std::vector<Decimal>),
           FilteredDecimalVectorBlock* out) {
   std::vector<Decimal> v(in.size());
 
-  Size i, nnz=0;
-  for (i = 0, nnz = 0; i < iter.cols.size(); ++i) {
+  Size i, nnz = 0;
+  for (i = 0; i < iter.cols.size(); ++i) {
     out->cols[i] = nnz;
     if (iter.cols[i+1] > iter.cols[i]) {
       for (Size j = 0; j < in.size(); ++j) {

@@ -4,6 +4,7 @@
 #ifndef ENGINE_INCLUDE_FILTER_H_
 #define ENGINE_INCLUDE_FILTER_H_
 
+#include <string>
 #include <vector>
 #include "include/block.hpp"
 

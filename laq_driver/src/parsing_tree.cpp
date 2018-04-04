@@ -1,6 +1,8 @@
 /*
  * Copyright (c) 2018 João Afonso. All rights reserved.
  */
+#include <string>
+#include <vector>
 #include <utility>
 #include "src/laq_statement.hpp"
 #include "src/parsing_tree.hpp"

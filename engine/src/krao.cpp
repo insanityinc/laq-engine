@@ -23,10 +23,6 @@ void krao(const FilteredBitVectorBlock& A,
           FilteredBitVectorBlock *C) {
   Size i, nnz = 0;
 
-  // std::cout << "A_nnz: " << A.nnz << ", B_nnz: " << B.nnz << ", C_nnz: " << C->nnz << std::endl;
-
-  // std::cout << "A_cols: " << A.cols.size() << ", B_cols: " << B.cols.size() << ", C_cols: " << C->cols.size() << std::endl;
-
   if (A.nnz < B.nnz) {
     for (i = 0; i < A.cols.size() - 1; ++i) {
       C->cols[i] = nnz;

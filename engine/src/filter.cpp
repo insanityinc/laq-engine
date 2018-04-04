@@ -2,9 +2,8 @@
  * Copyright (c) 2018 João Afonso. All rights Reserved.
  */
 #include "include/filter.hpp"
-
-#include <iostream>
-using namespace std;
+#include <string>
+#include <vector>
 
 namespace engine {
 

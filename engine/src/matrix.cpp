@@ -5,7 +5,6 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/string.hpp>
-//#include <experimental/filesystem>
 #include <string>
 #include "include/block.hpp"
 #include "include/matrix.hpp"
@@ -100,7 +99,7 @@ void DecimalVector::deleteBlock(Size idx) {
 
 void DecimalVector::saveBlock(Size idx) {
   std::string path = getPath() + "/blocks/" + std::to_string(idx);
-  DecimalVectorBlock* b = (DecimalVectorBlock*) blocks[idx];
+  DecimalVectorBlock* b = reinterpret_cast<DecimalVectorBlock*>(blocks[idx]);
   b->save(path);
 }
 
@@ -119,8 +118,7 @@ void DecimalVector::insert(Decimal value) {
     }
     blocks.push_back(new DecimalVectorBlock());
     ++nBlocks;
-  }
-  else if (blocks[nBlocks-1] == nullptr) {
+  } else if (blocks[nBlocks-1] == nullptr) {
     this->loadBlock(nBlocks-1);
   }
   blocks[nBlocks-1]->insert(value);
@@ -242,7 +240,6 @@ void Bitmap::saveLabelHash() {
 }
 
 void Bitmap::insert(Literal value) {
-
   if (nnz % BSIZE == 0) {
     if (nBlocks > 0 && blocks[nBlocks-1] != nullptr) {
       this->saveBlock(nBlocks-1);
@@ -257,15 +254,13 @@ void Bitmap::insert(Literal value) {
   if (!hash.contains(value)) {
     hash.insert(value);
     if (nrows % BSIZE == 0) {
-
       if (nLabelBlocks > 0 && labels[nLabelBlocks-1] != nullptr) {
         this->saveLabelBlock(nLabelBlocks-1);
         this->deleteLabelBlock(nLabelBlocks-1);
       }
       labels.push_back(new LabelBlock());
       ++nLabelBlocks;
-    }
-    else if (labels[nLabelBlocks-1] == nullptr) {
+    } else if (labels[nLabelBlocks-1] == nullptr) {
       this->loadLabelBlock(nLabelBlocks-1);
     }
     labels[nLabelBlocks-1]->insert(value);
@@ -298,7 +293,7 @@ DecimalMap::~DecimalMap() {
 }
 
 
-FilteredDecimalVector::FilteredDecimalVector(Size n_blocks) : Matrix(n_blocks){
+FilteredDecimalVector::FilteredDecimalVector(Size n_blocks) : Matrix(n_blocks) {
   blocks.reserve(nBlocks);
 }
 
@@ -309,7 +304,7 @@ FilteredDecimalVector::~FilteredDecimalVector() {
 }
 
 
-FilteredBitmap::FilteredBitmap(Size n_blocks) : Matrix(n_blocks){
+FilteredBitmap::FilteredBitmap(Size n_blocks) : Matrix(n_blocks) {
   blocks.reserve(nBlocks);
 }
 

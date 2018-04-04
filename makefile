@@ -36,13 +36,13 @@ delete: clean
 	rm -fr $(LAQ_DIR)/bin $(ENGINE_DIR)/bin data/la/*
 
 linter: $(LINTER)
-	@$(LINTER) $(LAQ_DIR)/src/*.cpp \
-			   $(LAQ_DIR)/*/*.hpp \
-			   $(LAQ_DIR)/test/*.cpp \
-			   $(ENGINE_DIR)/src/*.cpp \
-			   $(ENGINE_DIR)/*/*.hpp \
-			   $(ENGINE_DIR)/test/*.cpp \
-			   queries/cpp/*.cpp
+	@$< --extensions=hpp,cpp \
+		$(LAQ_DIR)/*/*.cpp \
+		$(LAQ_DIR)/*/*.hpp \
+		$(ENGINE_DIR)/*/*.cpp \
+		$(ENGINE_DIR)/*/*.hpp \
+		queries/cpp/*.cpp \
+		data/*.cpp
 
 test:
 	$(LAQ_DIR)/bin/test_laq
@@ -62,7 +62,7 @@ $(LAQ_DIR)/bin/test_laq: $(LAQ_DIR)/test/test_laq.cpp \
 
 
 
-$(ENGINE_DIR)/bin/q6: queries/cpp/6new.cc $(ENGINE_OBJ)
+$(ENGINE_DIR)/bin/q6: queries/cpp/6.cpp $(ENGINE_OBJ)
 	$(CXX) $(CXXFLAGS) -I $(ENGINE_DIR) -o $@ $^
 
 $(ENGINE_DIR)/bin/load: data/tpch_createDB.cpp $(ENGINE_OBJ)

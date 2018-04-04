@@ -4,7 +4,9 @@
 #ifndef ENGINE_INCLUDE_TYPES_H_
 #define ENGINE_INCLUDE_TYPES_H_
 
-// TODO: Use a cross platform lib to have coherent basic types
+#include <string>
+
+// TODO(João): Use a cross platform lib to have coherent basic types
 // Use GMP or other to represent multi precision
 typedef double Decimal;
 typedef uint64_t MultiPrecision;

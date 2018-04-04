@@ -1,7 +1,9 @@
 /*
  * Copyright (c) 2018 João Afonso. All rights Reserved.
  */
-
+#include "include/database.hpp"
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/string.hpp>
@@ -9,14 +11,9 @@
 #include <experimental/filesystem>
 #include <map>
 #include <string>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include <vector>
 #include "include/matrix.hpp"
-#include "include/database.hpp"
 #include "include/types.hpp"
-
-#include <iostream>
-using namespace std;
 
 namespace engine {
 
@@ -29,7 +26,7 @@ Database::Database(std::string dataPath, std::string databaseName) {
   #if defined(_WIN32)
     error = _mkdir((dataPath + "/" + databaseName).c_str());
   #else
-    error = mkdir((dataPath + "/" + databaseName).c_str(),mode);
+    error = mkdir((dataPath + "/" + databaseName).c_str(), mode);
   #endif
   if (error != 0) {
     // handle error here
@@ -75,7 +72,7 @@ void Database::createTable(std::string tableName,
   #ifdef _WIN32
     error = _mkdir(path.c_str());
   #else
-    error = mkdir(path.c_str(),mode);
+    error = mkdir(path.c_str(), mode);
   #endif
 
   for (const auto& attr : attributes) {
@@ -83,8 +80,8 @@ void Database::createTable(std::string tableName,
       error = _mkdir((path + "/" + attr.first).c_str());
       error = _mkdir((path + "/" + attr.first + "/blocks").c_str());
     #else
-      error = mkdir((path + "/" + attr.first).c_str(),mode);
-      error = mkdir((path + "/" + attr.first + "/blocks").c_str(),mode);
+      error = mkdir((path + "/" + attr.first).c_str(), mode);
+      error = mkdir((path + "/" + attr.first + "/blocks").c_str(), mode);
     #endif
     if (attr.second[0] == "measure") {
       DecimalVector v(data_path, database_name, tableName, attr.first);
@@ -93,7 +90,7 @@ void Database::createTable(std::string tableName,
       #ifdef _WIN32
         error = _mkdir((path + "/" + attr.first + "/labels").c_str());
       #else
-        error = mkdir((path + "/" + attr.first + "/labels").c_str(),mode);
+        error = mkdir((path + "/" + attr.first + "/labels").c_str(), mode);
       #endif
       Bitmap b(data_path, database_name, tableName, attr.first);
       b.save();
@@ -112,13 +109,11 @@ void Database::copyFrom(std::string inFilePath,
   std::ifstream input(inFilePath);
 
   if (input.is_open()) {
-
     std::string line;
 
     std::map<std::string, Matrix*> matrices;
 
     for (const auto& attr : attributes) {
-
       if (tables[outTable][attr.second][0] == "measure") {
         matrices[attr.second] = new DecimalVector(data_path,
                                                   database_name,
@@ -130,7 +125,6 @@ void Database::copyFrom(std::string inFilePath,
                                            outTable,
                                            attr.second);
       }
-
     }
 
 
@@ -139,18 +133,16 @@ void Database::copyFrom(std::string inFilePath,
       std::stringstream ss(line);
 
       for (Size i=0; std::getline(ss, value, delimiter); ++i) {
-
         if (attributes.find(i) != attributes.end()) {
-
           if (tables[outTable][attributes[i]][0] == "measure") {
-
             Decimal dec = std::stod(value);
-            DecimalVector *v = (DecimalVector*) matrices[attributes[i]];
+            DecimalVector *v =
+              reinterpret_cast<DecimalVector*>(matrices[attributes[i]]);
             v->insert((Decimal) dec);
 
           } else if (tables[outTable][attributes[i]][0] == "dimension") {
-
-            Bitmap *b = (Bitmap*) matrices[attributes[i]];
+            Bitmap *b =
+              reinterpret_cast<Bitmap*>(matrices[attributes[i]]);
             b->insert((Literal) value);
           }
         }
@@ -159,17 +151,18 @@ void Database::copyFrom(std::string inFilePath,
 
     for (const auto& mat : matrices) {
       if (tables[outTable][mat.first][0] == "measure") {
-        DecimalVector *v = (DecimalVector*) mat.second;
+        DecimalVector *v =
+              reinterpret_cast<DecimalVector*>(mat.second);
         v->saveLastBlock();
       } else if (tables[outTable][mat.first][0] == "dimension") {
-        Bitmap *b = (Bitmap*) mat.second;
+        Bitmap *b =
+              reinterpret_cast<Bitmap*>(mat.second);
         b->saveLastBlock();
         b->saveLastLabelBlock();
         b->saveLabelHash();
       }
       mat.second->save();
     }
-
   }
 }
 

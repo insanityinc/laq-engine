@@ -6,8 +6,8 @@
 
 #include <fstream>
 #include <map>
-#include <sstream>
 #include <string>
+#include <vector>
 #include "include/matrix.hpp"
 #include "include/types.hpp"
 

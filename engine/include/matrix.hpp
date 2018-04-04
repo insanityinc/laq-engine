@@ -16,39 +16,39 @@
 namespace engine {
 
 struct Matrix {
-    Size nnz;
-    Size nrows;
-    Size nBlocks;
-    Size nLabelBlocks;
-    std::string labelsTable;
-    std::string labelsAttribute;
+  Size nnz;
+  Size nrows;
+  Size nBlocks;
+  Size nLabelBlocks;
+  std::string labelsTable;
+  std::string labelsAttribute;
 
-    std::string dataPath;
-    std::string database;
-    std::string table;
-    std::string attribute;
+  std::string dataPath;
+  std::string database;
+  std::string table;
+  std::string attribute;
 
-    explicit Matrix(Size n_blocks);
-    explicit Matrix(const std::string data_path,
-                    const std::string database_name,
-                    const std::string table_name,
-                    const std::string attribute_name);
-    explicit Matrix(const std::string data_path,
-                    const std::string database_name,
-                    const std::string table_name,
-                    const std::string attribute_name,
-                    const std::string labels_table,
-                    const std::string labels_attribute);
+  explicit Matrix(Size n_blocks);
+  explicit Matrix(const std::string data_path,
+                  const std::string database_name,
+                  const std::string table_name,
+                  const std::string attribute_name);
+  explicit Matrix(const std::string data_path,
+                  const std::string database_name,
+                  const std::string table_name,
+                  const std::string attribute_name,
+                  const std::string labels_table,
+                  const std::string labels_attribute);
 
-    bool save();
+  bool save();
 
-  protected:
-    std::string getPath();
+ protected:
+  std::string getPath();
 };
 
 struct DecimalVector : public Matrix {
   std::vector<DecimalVectorBlock*> blocks;
-  DecimalVector(Size n_blocks);
+  explicit DecimalVector(Size n_blocks);
   DecimalVector(const std::string data_path,
                 const std::string database_name,
                 const std::string table_name,
@@ -82,7 +82,7 @@ struct Bitmap : public Matrix {
   std::vector<LabelBlock*> labels;
   LabelHash hash;
 
-  Bitmap(Size n_blocks);
+  explicit Bitmap(Size n_blocks);
   Bitmap(const std::string data_path,
          const std::string database_name,
          const std::string table_name,
@@ -114,31 +114,31 @@ struct Bitmap : public Matrix {
 
 struct FilteredBitVector : public Matrix {
   std::vector<FilteredBitVectorBlock*> blocks;
-  FilteredBitVector(Size n_blocks);
+  explicit FilteredBitVector(Size n_blocks);
   ~FilteredBitVector();
 };
 
 struct DecimalMap : public Matrix {
   std::vector<DecimalMapBlock*> blocks;
-  DecimalMap(Size n_blocks);
+  explicit DecimalMap(Size n_blocks);
   ~DecimalMap();
 };
 
 struct FilteredDecimalVector : public Matrix {
   std::vector<FilteredDecimalVectorBlock*> blocks;
-  FilteredDecimalVector(Size n_blocks);
+  explicit FilteredDecimalVector(Size n_blocks);
   ~FilteredDecimalVector();
 };
 
 struct FilteredBitmap : public Matrix {
   std::vector<FilteredBitmapBlock*> blocks;
-  FilteredBitmap(Size n_blocks);
+  explicit FilteredBitmap(Size n_blocks);
   ~FilteredBitmap();
 };
 
 struct FilteredDecimalMap : public Matrix {
   std::vector<FilteredDecimalMapBlock*> blocks;
-  FilteredDecimalMap(Size n_blocks);
+  explicit FilteredDecimalMap(Size n_blocks);
   ~FilteredDecimalMap();
 };
 

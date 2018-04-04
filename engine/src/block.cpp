@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2018 João Afonso. All rights Reserved.
  */
-
+#include "include/block.hpp"
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/string.hpp>
-#include "include/block.hpp"
+#include <string>
 
 namespace engine {
 
@@ -100,17 +100,21 @@ FilteredBitVectorBlock::FilteredBitVectorBlock() : Block(), cols(BSIZE + 1, 0) {
   cols[0] = 0;
 }
 
-DecimalMapBlock::DecimalMapBlock() : Block(), values(BSIZE, 0), rows(BSIZE, 0) {}
+DecimalMapBlock::DecimalMapBlock()
+  : Block(), values(BSIZE, 0), rows(BSIZE, 0) {}
 
-FilteredDecimalVectorBlock::FilteredDecimalVectorBlock() : Block(), values(BSIZE, 0), cols(BSIZE + 1, 0) {
+FilteredDecimalVectorBlock::FilteredDecimalVectorBlock()
+  : Block(), values(BSIZE, 0), cols(BSIZE + 1, 0) {
   cols[0] = 0;
 }
 
-FilteredBitmapBlock::FilteredBitmapBlock() : Block(), rows(BSIZE, 0), cols(BSIZE + 1, 0) {
+FilteredBitmapBlock::FilteredBitmapBlock()
+  : Block(), rows(BSIZE, 0), cols(BSIZE + 1, 0) {
   cols[0] = 0;
 }
 
-FilteredDecimalMapBlock::FilteredDecimalMapBlock() : Block(), values(BSIZE, 0), rows(BSIZE, 0), cols(BSIZE + 1, 0) {
+FilteredDecimalMapBlock::FilteredDecimalMapBlock()
+  : Block(), values(BSIZE, 0), rows(BSIZE, 0), cols(BSIZE + 1, 0) {
   cols[0] = 0;
 }
 

@@ -2,21 +2,19 @@
  * Linear Algebra Query 14
  */
 
-A = filter( match( p.type , ".+PROMO.+" ) )     // 1 <-- #p
-B = dot( A, l.partkey )                         // 1 <-- #l
-C = filter( l.shipdate >= "1995-09-01" )        // 1 <-- #l
-D = filter( l.shipdate < "1995-10-01" )         // 1 <-- #l
-E = hadamard( C, D )                            // 1 <-- #l
-F = map( l.extendedprice*(1-l.discount) )       // 1 <-- #l
-G = hadamard( E, F )							// 1 <-- #l
-H = hadamard( B, G )                            // 1 <-- #l
-I = sum( G )                                    // 1 <-- 1
-J = sum( H )                                    // 1 <-- 1
-K = map( 100.00 * J / I )                       // 1 <-- 1
-return ( K )                                    // RESULT
+A = filter( lineitem.shipdate >= "1995-09-01" AND lineitem.shipdate < "1995-10-01") // 1 <-- #l
+B = map( lineitem.extendedprice*(1-lineitem.discount) )                             // 1 <-- #l
+C = hadamard( A, B )							                                    // 1 <-- #l
+D = filter( match( part.type , ".+PROMO.+" ) )                                      // 1 <-- #p
+E = dot( D, lineitem.partkey )                                                      // 1 <-- #l
+F = hadamard( C, E )                                                                // 1 <-- #l
+G = sum( C )                                                                        // 1 <-- 1
+H = sum( F )                                                                        // 1 <-- 1
+I = map( 100.00 * H / G )                                                           // 1 <-- 1
+return ( I )                                                                        // RESULT
 
 /** Expected result:
   *
-  * PROMO_REVENUE 
+  * PROMO_REVENUE
   * 16.38
   */

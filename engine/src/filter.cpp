@@ -2,8 +2,8 @@
  * Copyright (c) 2018 João Afonso. All rights Reserved.
  */
 #include "include/filter.hpp"
-#include <string>
 #include <vector>
+#include "include/types.hpp"
 
 namespace engine {
 
@@ -25,10 +25,10 @@ void filter(bool(*f)(std::vector<Decimal>),
   out->nnz = nnz;
 }
 
-void filter(bool(*f)(std::vector<std::string>),
+void filter(bool(*f)(std::vector<Literal>),
             const std::vector<LabelBlock>& in,
             FilteredBitVectorBlock* out) {
-  std::vector<std::string> v(in.size());
+  std::vector<Literal> v(in.size());
   Size i, nnz = 0;
   for (i = 0; i < in[0].nnz; ++i) {
     out->cols[i] = nnz;

@@ -6,6 +6,8 @@
 
 #include <string>
 
+namespace engine {
+
 // TODO(João): Use a cross platform lib to have coherent basic types
 // Use GMP or other to represent multi precision
 typedef double Decimal;
@@ -16,5 +18,7 @@ typedef size_t Size;
 #ifndef BSIZE
 #define BSIZE 1024
 #endif
+
+}  // namespace engine
 
 #endif  // ENGINE_INCLUDE_TYPES_H_

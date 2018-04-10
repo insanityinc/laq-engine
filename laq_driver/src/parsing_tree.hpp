@@ -5,29 +5,44 @@
 #define LAQ_DRIVER_SRC_PARSING_TREE_H_
 #include <map>
 #include <string>
-#include <tuple>
 #include <vector>
+#include "include/database.hpp"
 #include "include/laq_driver.hpp"
 
 namespace laq {
 
-class driver::parsing_tree {
- public:
-  parsing_tree();
+typedef
+std::map<std::tuple<std::string, std::string, std::string>, std::string>
+// std::map<std::string, std::map<std::string, std::map<std::string, std::string>>>
+MatrixTypeMap;
 
-  void insert_statement(const std::string& lvar,
-                        const std::string& op,
-                        const std::vector<std::string>& rvars,
-                        const std::string& expr);
+typedef
+std::map<std::string, std::string>
+AttributeTypes;
+
+class driver::ParsingTree {
+ public:
+  ParsingTree();
+
+  void insertStatement(const std::string& lvar,
+                       const std::string& op,
+                       const std::vector<std::string>& rvars,
+                       const std::string& expr);
 
   std::string getQuery();
 
- private:
-  class statement;
+  std::string toCpp(engine::Database db);
 
-  std::map<std::string, statement> tree;
+ private:
+  class Statement;
+
+  std::string getType(MatrixTypeMap& matTypeMap,
+                      AttributeTypes& attrTypes,
+                      const std::string& var);
+
+  std::map<std::string, Statement> tree;
   std::vector<std::string> vars;
-};  // class parsing_tree
+};  // class ParsingTree
 
 }  // namespace laq
 

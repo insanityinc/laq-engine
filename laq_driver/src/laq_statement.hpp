@@ -9,9 +9,9 @@
 
 namespace laq {
 
-class driver::parsing_tree::statement {
+class driver::ParsingTree::Statement {
  public:
-  statement(const std::string& op,
+  Statement(const std::string& op,
             const std::string& expr,
             const std::vector<std::string>& rvars);
 

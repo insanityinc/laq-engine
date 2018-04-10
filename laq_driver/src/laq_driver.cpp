@@ -3,13 +3,14 @@
  */
 #include <string>
 #include <vector>
+#include "include/database.hpp"
 #include "include/laq_driver.hpp"
 #include "src/parsing_tree.hpp"
 
 namespace laq {
 
 driver::driver() : trace_scanning(false), trace_parsing(false) {
-  laquery = new parsing_tree();
+  laquery = new ParsingTree();
 }
 
 driver::~driver() {
@@ -55,20 +56,31 @@ driver::var_exists(const std::string& var) {
   return (variables.find(var) != variables.end());
 }
 
+void
+driver::addDatabaseVar(const std::string& table,
+                       const std::string& attribute) {
+  dbvars.insert(std::pair<std::string, std::string>(table, attribute));
+}
+
 int
-driver::insert_statement(const std::string& lvar,
-                         const std::string& op,
-                         const std::vector<std::string>& rvars,
-                         const std::string& expr) {
+driver::insertStatement(const std::string& lvar,
+                        const std::string& op,
+                        const std::vector<std::string>& rvars,
+                        const std::string& expr) {
   if (rvars.empty() && expr.empty())
     return 1;
-  laquery->insert_statement(lvar, op, rvars, expr);
+  laquery->insertStatement(lvar, op, rvars, expr);
   return 0;
 }
 
 std::string
 driver::getQuery() {
   return laquery->getQuery();
+}
+
+std::string
+driver::toCpp(engine::Database db) {
+  return laquery->toCpp(db);
 }
 
 size_t

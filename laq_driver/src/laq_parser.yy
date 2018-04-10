@@ -77,7 +77,7 @@ statement
   : IDENTIFIER '=' product '(' ident ',' ident ')'        { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
-                                                            driver->insert_statement(*$1, *$3, std::vector<std::string> {*$5, *$7});
+                                                            driver->insertStatement(*$1, *$3, std::vector<std::string> {*$5, *$7});
                                                             delete $1;
                                                             delete $3;
                                                             delete $5;
@@ -86,7 +86,7 @@ statement
   | IDENTIFIER '=' bang '(' ident ')'                     { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
-                                                            driver->insert_statement(*$1, *$3, std::vector<std::string> {*$5});
+                                                            driver->insertStatement(*$1, *$3, std::vector<std::string> {*$5});
                                                             delete $1;
                                                             delete $3;
                                                             delete $5;
@@ -95,7 +95,7 @@ statement
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             std::vector<std::string> expvars = driver->clear_exp_vars();
-                                                            driver->insert_statement(*$1, "filter", expvars, *$5);
+                                                            driver->insertStatement(*$1, "filter", expvars, *$5);
                                                             delete $1;
                                                             delete $5;
                                                           }
@@ -103,12 +103,12 @@ statement
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             std::vector<std::string> expvars = driver->clear_exp_vars();
-                                                            driver->insert_statement(*$1, "lift", expvars, *$5);
+                                                            driver->insertStatement(*$1, "lift", expvars, *$5);
                                                             delete $1;
                                                             delete $5;
                                                           }
   | RETURN '(' varlist ')'                                { std::vector<std::string> varlist = driver->clear_exp_vars();
-                                                            driver->insert_statement("$$", "return", varlist);
+                                                            driver->insertStatement("$$", "return", varlist);
                                                           }
   ;
 
@@ -127,6 +127,7 @@ ident
                                                             $$ = $1;
                                                           }
   | IDENTIFIER '.' IDENTIFIER                             { $$ = new std::string(*$1 + "_" + *$3);
+                                                            driver->addDatabaseVar(*$1, *$3);
                                                             delete $1;
                                                             delete $3;
                                                           }

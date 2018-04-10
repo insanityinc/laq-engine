@@ -7,7 +7,7 @@
 
 namespace laq {
 
-driver::parsing_tree::statement::statement(
+driver::ParsingTree::Statement::Statement(
                                   const std::string& op,
                                   const std::string& expr,
                                   const std::vector<std::string>& rvars) {
@@ -17,7 +17,7 @@ driver::parsing_tree::statement::statement(
 }
 
 std::string
-driver::parsing_tree::statement::toString() {
+driver::ParsingTree::Statement::toString() {
   std::string res = operation + "(";
   if (!expression.empty()) {
     res += expression + ")";

@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2018 João Afonso. All rights reserved.
  *
- * Example of C++ main function
- * TPC-H Query 6
+ * This query was automatically generated
  */
 #include <iostream>
 #include <vector>
 #include "include/block.hpp"
+#include "include/database.hpp"
 #include "include/dot.hpp"
 #include "include/filter.hpp"
 #include "include/fold.hpp"
@@ -14,14 +14,6 @@
 #include "include/lift.hpp"
 #include "include/matrix.hpp"
 #include "include/types.hpp"
-
-#ifndef DATA_PATH
-  #define DATA_PATH "data/la"
-#endif
-
-#ifndef DATABASE
-  #define DATABASE "TPCH_1"
-#endif
 
 inline bool filter_a(std::vector<engine::Literal> args) {
   return args[0] >= "1994-01-01" && args[0] < "1995-01-01";
@@ -40,14 +32,30 @@ inline engine::Decimal lift_f(std::vector<engine::Decimal> args) {
 }
 
 int main() {
+  engine::Database db(
+    "data/la",
+    "TPCH_1");
+
   engine::Bitmap *lineitem_shipdate =
-    new engine::Bitmap(DATA_PATH, DATABASE, "lineitem", "shipdate");
+    new engine::Bitmap(db.data_path,
+                       db.database_name,
+                       "lineitem",
+                       "shipdate");
   engine::DecimalVector *lineitem_discount =
-    new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "discount");
+    new engine::DecimalVector(db.data_path,
+                              db.database_name,
+                              "lineitem",
+                              "discount");
   engine::DecimalVector *lineitem_quantity =
-    new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "quantity");
+    new engine::DecimalVector(db.data_path,
+                              db.database_name,
+                              "lineitem",
+                              "quantity");
   engine::DecimalVector *lineitem_extendedprice =
-    new engine::DecimalVector(DATA_PATH, DATABASE, "lineitem", "extendedprice");
+    new engine::DecimalVector(db.data_path,
+                              db.database_name,
+                              "lineitem",
+                              "extendedprice");
 
   engine::FilteredBitVector *a_pred =
     new engine::FilteredBitVector(lineitem_shipdate->nLabelBlocks);

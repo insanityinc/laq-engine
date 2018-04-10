@@ -23,14 +23,18 @@ struct Database {
   bool load();
   bool save();
 
-  void createTable(std::string tableName,
-                   std::map<std::string, std::vector<std::string>> attributes);
+  bool isMeasure(const std::string& table, const std::string attribute);
+  bool isDimension(const std::string& table, const std::string attribute);
+
+  void
+  createTable(const std::string& tableName,
+              const std::map<std::string,std::vector<std::string>>& attributes);
 
   // attributes: map of attribute name -> column in the file
-  void copyFrom(std::string inFilePath,
-                std::string outTable,
-                std::map<Size, std::string> attributes,
-                char delimiter);
+  void copyFrom(const std::string& inFilePath,
+                const std::string& outTable,
+                const std::map<Size, std::string>& attributes,
+                const char delimiter);
 };
 
 }  // namespace engine

@@ -61,9 +61,19 @@ bool Database::save() {
   return false;
 }
 
-void Database::createTable(std::string tableName,
-                           std::map<std::string,
-                           std::vector<std::string>> attributes) {
+bool Database::isMeasure(const std::string& table,
+                         const std::string attribute) {
+  return tables[table][attribute][0] == "measure";
+}
+
+bool Database::isDimension(const std::string& table,
+                           const std::string attribute) {
+  return tables[table][attribute][0] == "dimension";
+}
+
+void Database::createTable(
+  const std::string& tableName,
+  const std::map<std::string,std::vector<std::string>>& attributes) {
   tables[tableName] = attributes;
 
   std::string path = data_path + "/" + database_name + "/" + tableName;
@@ -102,10 +112,10 @@ void Database::createTable(std::string tableName,
   this->save();
 }
 
-void Database::copyFrom(std::string inFilePath,
-                        std::string outTable,
-                        std::map<Size, std::string> attributes,
-                        char delimiter) {
+void Database::copyFrom(const std::string& inFilePath,
+                        const std::string& outTable,
+                        const std::map<Size, std::string>& attributes,
+                        const char delimiter) {
   std::ifstream input(inFilePath);
 
   if (input.is_open()) {
@@ -114,12 +124,12 @@ void Database::copyFrom(std::string inFilePath,
     std::map<std::string, Matrix*> matrices;
 
     for (const auto& attr : attributes) {
-      if (tables[outTable][attr.second][0] == "measure") {
+      if (tables.at(outTable).at(attr.second).at(0) == "measure") {
         matrices[attr.second] = new DecimalVector(data_path,
                                                   database_name,
                                                   outTable,
                                                   attr.second);
-      } else if (tables[outTable][attr.second][0] == "dimension") {
+      } else if (tables.at(outTable).at(attr.second).at(0) == "dimension") {
         matrices[attr.second] = new Bitmap(data_path,
                                            database_name,
                                            outTable,
@@ -134,15 +144,16 @@ void Database::copyFrom(std::string inFilePath,
 
       for (Size i=0; std::getline(ss, value, delimiter); ++i) {
         if (attributes.find(i) != attributes.end()) {
-          if (tables[outTable][attributes[i]][0] == "measure") {
+          if (tables.at(outTable).at(attributes.at(i)).at(0) == "measure") {
             Decimal dec = std::stod(value);
             DecimalVector *v =
-              reinterpret_cast<DecimalVector*>(matrices[attributes[i]]);
+              reinterpret_cast<DecimalVector*>(matrices[attributes.at(i)]);
             v->insert((Decimal) dec);
 
-          } else if (tables[outTable][attributes[i]][0] == "dimension") {
+          } else if (
+              tables.at(outTable).at(attributes.at(i)).at(0) == "dimension") {
             Bitmap *b =
-              reinterpret_cast<Bitmap*>(matrices[attributes[i]]);
+              reinterpret_cast<Bitmap*>(matrices[attributes.at(i)]);
             b->insert((Literal) value);
           }
         }
@@ -150,11 +161,11 @@ void Database::copyFrom(std::string inFilePath,
     }
 
     for (const auto& mat : matrices) {
-      if (tables[outTable][mat.first][0] == "measure") {
+      if (tables.at(outTable).at(mat.first).at(0) == "measure") {
         DecimalVector *v =
               reinterpret_cast<DecimalVector*>(mat.second);
         v->saveLastBlock();
-      } else if (tables[outTable][mat.first][0] == "dimension") {
+      } else if (tables.at(outTable).at(mat.first).at(0) == "dimension") {
         Bitmap *b =
               reinterpret_cast<Bitmap*>(mat.second);
         b->saveLastBlock();

@@ -22,12 +22,11 @@ ENGINE_OBJ = $(ENGINE_DIR)/build/block.o \
 
 .PHONY: all clean delete linter test count
 
-all: $(ENGINE_DIR)/build $(ENGINE_DIR)/bin/q6 $(ENGINE_DIR)/bin/load
+all: engine laq
 
-#all: $(LAQ_DIR)/build \
-	 $(ENGINE_DIR)/build \
-	 $(LAQ_DIR)/bin/test_laq \
-	 $(ENGINE_DIR)/bin/q6
+engine: $(ENGINE_DIR)/build $(ENGINE_DIR)/bin/q6 $(ENGINE_DIR)/bin/load
+
+laq: $(LAQ_DIR)/build $(LAQ_DIR)/bin/test_laq
 
 clean:
 	rm -fr $(LAQ_DIR)/build $(ENGINE_DIR)/build
@@ -57,8 +56,9 @@ $(LAQ_DIR)/bin/test_laq: $(LAQ_DIR)/test/test_laq.cpp \
 						 $(LAQ_DIR)/build/laq_driver.o \
 						 $(LAQ_DIR)/build/parsing_tree.o \
 						 $(LAQ_DIR)/build/laq_statement.o \
+						 $(ENGINE_OBJ) \
 						 libgtest.a
-	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(LAQ_DIR)
+	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(LAQ_DIR) -I $(ENGINE_DIR)
 
 
 
@@ -81,19 +81,19 @@ $(ENGINE_DIR)/build:
 ########## LAQ parser objects ##########
 
 $(LAQ_DIR)/build/laq_parser.o: $(LAQ_DIR)/build/laq_parser.cpp
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(LAQ_DIR)/build -o $@
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(ENGINE_DIR) -I $(LAQ_DIR)/build -o $@
 
 $(LAQ_DIR)/build/lex.yy.o: $(LAQ_DIR)/build/lex.yy.cpp
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(ENGINE_DIR) -o $@
 
 $(LAQ_DIR)/build/laq_driver.o: $(LAQ_DIR)/src/laq_driver.cpp
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(ENGINE_DIR) -o $@
 
 $(LAQ_DIR)/build/parsing_tree.o: $(LAQ_DIR)/src/parsing_tree.cpp
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(ENGINE_DIR) -o $@
 
 $(LAQ_DIR)/build/laq_statement.o: $(LAQ_DIR)/src/laq_statement.cpp
-	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -o $@
+	$(CXX) $(CXXFLAGS) -c $< -I $(LAQ_DIR) -I $(ENGINE_DIR) -o $@
 
 
 ########## LAQ parser flex and bison ##########

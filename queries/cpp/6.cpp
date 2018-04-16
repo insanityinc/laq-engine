@@ -34,7 +34,8 @@ inline engine::Decimal lift_f(std::vector<engine::Decimal> args) {
 int main() {
   engine::Database db(
     "data/la",
-    "TPCH_1");
+    "TPCH_1",
+    false);
 
   engine::Bitmap *lineitem_shipdate =
     new engine::Bitmap(db.data_path,
@@ -72,10 +73,11 @@ int main() {
   engine::DecimalVector *f =
     new engine::DecimalVector(lineitem_extendedprice->nBlocks);
   engine::FilteredDecimalVector *g =
-    new engine::FilteredDecimalVector(c->nBlocks);
+    new engine::FilteredDecimalVector(e->nBlocks);
   engine::Decimal *h =
     new engine::Decimal();
 
+  #pragma omp parallel for
   for (engine::Size i = 0; i < lineitem_shipdate->nLabelBlocks; ++i) {
     // A = filter( lineitem.shipdate >= "1994-01-01"
     //             AND lineitem.shipdate < "1995-01-01" )
@@ -85,6 +87,7 @@ int main() {
     lineitem_shipdate->deleteLabelBlock(i);
   }
 
+  #pragma omp parallel for
   for (engine::Size i = 0; i < lineitem_shipdate->nBlocks; ++i) {
     // A = filter( lineitem.shipdate >= "1994-01-01"
     //             AND lineitem.shipdate < "1995-01-01" )
@@ -135,6 +138,8 @@ int main() {
     // H = sum( G )
     sum(*(g->blocks[i]), h);
   }
+
+  delete a_pred;
 
   std::cout << (*h) << std::endl;
 

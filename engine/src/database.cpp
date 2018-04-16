@@ -17,22 +17,24 @@
 
 namespace engine {
 
-Database::Database(std::string dataPath, std::string databaseName) {
+Database::Database(std::string dataPath, std::string databaseName, bool save) {
   data_path = dataPath;
   database_name = databaseName;
 
-  mode_t mode = 0733;
-  int error = 0;
-  #if defined(_WIN32)
-    error = _mkdir((dataPath + "/" + databaseName).c_str());
-  #else
-    error = mkdir((dataPath + "/" + databaseName).c_str(), mode);
-  #endif
-  if (error != 0) {
-    // handle error here
-  }
+  if (save) {
+    mode_t mode = 0733;
+    int error = 0;
+    #if defined(_WIN32)
+      error = _mkdir((dataPath + "/" + databaseName).c_str());
+    #else
+      error = mkdir((dataPath + "/" + databaseName).c_str(), mode);
+    #endif
+    if (error != 0) {
+      // handle error here
+    }
 
-  this->save();
+    this->save();
+  }
 }
 
 bool Database::load() {

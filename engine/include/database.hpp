@@ -18,7 +18,7 @@ struct Database {
   std::string database_name;
   std::map<std::string, std::map<std::string, std::vector<std::string>>> tables;
 
-  Database(std::string dataPath, std::string databaseName);
+  Database(std::string dataPath, std::string databaseName, bool save);
 
   bool load();
   bool save();

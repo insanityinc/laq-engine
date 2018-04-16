@@ -126,7 +126,7 @@ ident
                                                               driver->error("Error: Undeclared variable " + *$1);
                                                             $$ = $1;
                                                           }
-  | IDENTIFIER '.' IDENTIFIER                             { $$ = new std::string(*$1 + "_" + *$3);
+  | IDENTIFIER '.' IDENTIFIER                             { $$ = new std::string(*$1 + "." + *$3);
                                                             driver->addDatabaseVar(*$1, *$3);
                                                             delete $1;
                                                             delete $3;

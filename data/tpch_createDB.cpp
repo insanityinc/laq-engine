@@ -18,7 +18,7 @@
 int main() {
   // check if database exists, if not create it
   // else return table exists
-  engine::Database db(DATA_PATH, "TPCH_1");
+  engine::Database db(DATA_PATH, "TPCH_1", true);
 
   // check if table exists, if not create it
   // else return table exists

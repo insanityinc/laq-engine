@@ -2,6 +2,7 @@
  * Copyright (c) 2018 João Afonso. All rights reserved.
  */
 #include <string>
+#include <tuple>
 #include <vector>
 #include "include/database.hpp"
 #include "include/laq_driver.hpp"
@@ -59,7 +60,7 @@ driver::var_exists(const std::string& var) {
 void
 driver::addDatabaseVar(const std::string& table,
                        const std::string& attribute) {
-  dbvars.insert(std::pair<std::string, std::string>(table, attribute));
+  dbvars.insert(std::make_pair(table, attribute));
 }
 
 int

@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O2 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic -Werror
+CXXFLAGS = -O3 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic -fopenmp -Werror
 #-Wno-unused-parameter
 
 DBGEN_DATA = -D data/dbgen
@@ -30,9 +30,10 @@ laq: $(LAQ_DIR)/build $(LAQ_DIR)/bin/test_laq
 
 clean:
 	rm -fr $(LAQ_DIR)/build $(ENGINE_DIR)/build
+	rm -fr $(LAQ_DIR)/bin $(ENGINE_DIR)/bin
 
 delete: clean
-	rm -fr $(LAQ_DIR)/bin $(ENGINE_DIR)/bin data/la/*
+	rm -fr  data/la/*
 
 linter: $(LINTER)
 	@$< --extensions=hpp,cpp \

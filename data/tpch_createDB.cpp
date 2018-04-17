@@ -15,10 +15,19 @@
   #define DBGEN_DATA_PATH "data/dbgen"
 #endif
 
+#ifndef DATASET
+  #define DATASET "1"
+#endif
+#ifndef BSIZE
+  #define BSIZE 1024
+#endif
+
 int main() {
   // check if database exists, if not create it
   // else return table exists
-  engine::Database db(DATA_PATH, "TPCH_1", true);
+  engine::Database db(DATA_PATH,
+                      std::string("TPCH_") + DATASET,
+                      true);
 
   // check if table exists, if not create it
   // else return table exists
@@ -32,7 +41,7 @@ int main() {
   // copy from "path" to "table" {file column, "attribute"},
   // separating by "delimiter"
 
-  db.copyFrom(std::string(DBGEN_DATA_PATH) + "/1/lineitem.tbl",
+  db.copyFrom(std::string(DBGEN_DATA_PATH) + "/" + std::string(DATASET) + "/lineitem.tbl",
     "lineitem",
     {
       {4, "quantity"},

@@ -15,6 +15,10 @@
 #include "include/matrix.hpp"
 #include "include/types.hpp"
 
+#ifndef DATASET
+  #define DATASET "1"
+#endif
+
 inline bool filter_a(std::vector<engine::Literal> args) {
   return args[0] >= "1994-01-01" && args[0] < "1995-01-01";
 }
@@ -34,7 +38,7 @@ inline engine::Decimal lift_f(std::vector<engine::Decimal> args) {
 int main() {
   engine::Database db(
     "data/la",
-    "TPCH_1",
+    std::string("TPCH_") + DATASET,
     false);
 
   engine::Bitmap *lineitem_shipdate =
@@ -136,7 +140,11 @@ int main() {
     delete f->blocks[i];
 
     // H = sum( G )
-    sum(*(g->blocks[i]), h);
+    #pragma omp critical
+    {
+      sum(*(g->blocks[i]), h);
+    }
+    delete g->blocks[i];
   }
 
   delete a_pred;

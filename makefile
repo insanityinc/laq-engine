@@ -1,9 +1,20 @@
 CXX = g++
-CXXFLAGS = -O3 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic -fopenmp -Werror
-#-Wno-unused-parameter
+CXX_TMP_FLAGS = -O3 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic -fopenmp -Werror
 
-DBGEN_DATA = -D data/dbgen
-LA_DATA = -D data/la
+
+ifdef DATASET
+ifdef BSIZE
+CXXFLAGS = $(CXX_TMP_FLAGS) -DDATASET=\"$(DATASET)\" -DBSIZE=$(BSIZE)
+else
+CXXFLAGS = $(CXX_TMP_FLAGS) -DDATASET=\"$(DATASET)\"
+endif
+else
+ifdef BSIZE
+CXXFLAGS = $(CXX_TMP_FLAGS) -DBSIZE=$(BSIZE)
+else
+CXXFLAGS = $(CXX_TMP_FLAGS)
+endif
+endif
 
 LAQ_DIR = laq_driver
 ENGINE_DIR = engine

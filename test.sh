@@ -20,6 +20,6 @@ do
         make -j4
         time engine/bin/load
         # Test the current dataset
-        python "test.py ${i} ${blSize} 6"
+        python "test.py" "${i}" "${blSize}" "6"
     done
 done

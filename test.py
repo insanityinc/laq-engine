@@ -71,8 +71,9 @@ def main(argv):
       )
 
       # get query results
-      output, _ = execution.communicate(input=query.format(data_size))
-      output_line_list = output.splitlines()
+      start = clock()
+      _ = execution.communicate(input=query.format(data_size))
+      end = clock()
 
       # stop profiler
       time.sleep(2)
@@ -91,7 +92,7 @@ def main(argv):
 
 
       # calculate execution time
-      t_acc = float(output_line_list[-2].split('\t')[1])
+      t_acc = float(end-start)
       exec_time.append( t_acc )
 
       print t_acc

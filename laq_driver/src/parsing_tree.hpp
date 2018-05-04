@@ -20,6 +20,10 @@ typedef
 std::map<std::string, std::string>
 AttributeTypes;
 
+typedef
+std::map<std::string, std::tuple<std::string, engine::Size, engine::Size>>
+AttributeAlloc;
+
 class driver::ParsingTree {
  public:
   ParsingTree();
@@ -34,13 +38,31 @@ class driver::ParsingTree {
   std::string toCpp(engine::Database& db);
 
  private:
+  struct ForLoop {
+    std::string head;
+    std::string tail;
+    std::vector<std::string> deleteVars;
+    ForLoop(std::string h, std::string t) : head(h), tail(t) {}
+  };
+
+  std::vector<ForLoop>
+  getForLoops(AttributeTypes& attrTypes,
+              AttributeAlloc& attrAlloc,
+              const std::string& var);
+
   std::pair<std::string, std::string>
   declareTmpVars(MatrixTypeMap& matTypeMap,
                  AttributeTypes& attrTypes,
                  const std::string& var);
+
   std::string
   predicates(AttributeTypes& attrTypes,
              const std::string& var);
+
+  AttributeAlloc
+  getAttrAlloc(MatrixTypeMap& matTypeMap,
+               AttributeTypes& attrTypes,
+               const std::string& var);
 
   class Statement;
 

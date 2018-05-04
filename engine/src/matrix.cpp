@@ -281,6 +281,10 @@ FilteredBitVector::~FilteredBitVector() {
   }
 }
 
+void FilteredBitVector::deleteBlock(Size idx) {
+  delete blocks[idx];
+}
+
 
 DecimalMap::DecimalMap(Size n_blocks) : Matrix(n_blocks) {
   blocks.reserve(nBlocks);
@@ -290,6 +294,10 @@ DecimalMap::~DecimalMap() {
   for (auto bl : blocks) {
     delete bl;
   }
+}
+
+void DecimalMap::deleteBlock(Size idx) {
+  delete blocks[idx];
 }
 
 
@@ -303,6 +311,10 @@ FilteredDecimalVector::~FilteredDecimalVector() {
   }
 }
 
+void FilteredDecimalVector::deleteBlock(Size idx) {
+  delete blocks[idx];
+}
+
 
 FilteredBitmap::FilteredBitmap(Size n_blocks) : Matrix(n_blocks) {
   blocks.reserve(nBlocks);
@@ -314,6 +326,10 @@ FilteredBitmap::~FilteredBitmap() {
   }
 }
 
+void FilteredBitmap::deleteBlock(Size idx) {
+  delete blocks[idx];
+}
+
 
 FilteredDecimalMap::FilteredDecimalMap(Size n_blocks) : Matrix(n_blocks) {
   blocks.reserve(nBlocks);
@@ -323,6 +339,10 @@ FilteredDecimalMap::~FilteredDecimalMap() {
   for (auto bl : blocks) {
     delete bl;
   }
+}
+
+void FilteredDecimalMap::deleteBlock(Size idx) {
+  delete blocks[idx];
 }
 
 }  // namespace engine

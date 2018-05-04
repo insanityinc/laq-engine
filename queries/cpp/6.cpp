@@ -5,6 +5,7 @@
  */
 #include <iostream>
 #include <vector>
+#include <chrono>
 #include "include/block.hpp"
 #include "include/database.hpp"
 #include "include/dot.hpp"
@@ -36,6 +37,8 @@ inline engine::Decimal lift_f(std::vector<engine::Decimal> args) {
 }
 
 int main() {
+  auto start = std::chrono::high_resolution_clock::now();
+
   engine::Database db(
     "data/la",
     std::string("TPCH_") + DATASET,
@@ -108,48 +111,55 @@ int main() {
     // C = filter( lineitem.quantity < 24 )
     lineitem_quantity->loadBlock(i);
     c->blocks[i] = new engine::FilteredBitVectorBlock();
-    filter(filter_c, {*(lineitem_quantity->blocks[i])}, c->blocks[i]);
+    filter(filter_c,
+      {*(lineitem_quantity->blocks[i])},
+      c->blocks[i]);
     lineitem_quantity->deleteBlock(i);
 
     // D = hadamard( A, B )
     d->blocks[i] = new engine::FilteredBitVectorBlock();
     krao(*(a->blocks[i]), *(b->blocks[i]), d->blocks[i]);
-    delete a->blocks[i];
-    delete b->blocks[i];
+    a->deleteBlock(i);
+    b->deleteBlock(i);
 
     // E = hadamard( C, D )
     e->blocks[i] = new engine::FilteredBitVectorBlock();
     krao(*(c->blocks[i]), *(d->blocks[i]), e->blocks[i]);
-    delete c->blocks[i];
-    delete d->blocks[i];
+    c->deleteBlock(i);
+    d->deleteBlock(i);
 
     // F = lift( lineitem.extendedprice * lineitem.discount )
     lineitem_extendedprice->loadBlock(i);
     f->blocks[i] = new engine::DecimalVectorBlock();
-    lift(lift_f,
-         {*(lineitem_discount->blocks[i]),
-         *(lineitem_extendedprice->blocks[i])},
-         f->blocks[i]);
+    lift(lift_f, {
+      *(lineitem_discount->blocks[i]),
+      *(lineitem_extendedprice->blocks[i])},
+      f->blocks[i]);
     lineitem_extendedprice->deleteBlock(i);
     lineitem_discount->deleteBlock(i);
 
     // G = hadamard( E, F )
     g->blocks[i] = new engine::FilteredDecimalVectorBlock();
     krao(*(e->blocks[i]), *(f->blocks[i]), g->blocks[i]);
-    delete e->blocks[i];
-    delete f->blocks[i];
+    e->deleteBlock(i);
+    f->deleteBlock(i);
 
     // H = sum( G )
     #pragma omp critical
     {
       sum(*(g->blocks[i]), h);
     }
-    delete g->blocks[i];
+    g->deleteBlock(i);
   }
 
   delete a_pred;
 
   std::cout << (*h) << std::endl;
+
+  delete h;
+
+  auto end = std::chrono::high_resolution_clock::now();
+  std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count() << std::endl;
 
   return 0;
 }

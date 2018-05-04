@@ -116,30 +116,35 @@ struct FilteredBitVector : public Matrix {
   std::vector<FilteredBitVectorBlock*> blocks;
   explicit FilteredBitVector(Size n_blocks);
   ~FilteredBitVector();
+  void deleteBlock(Size idx);
 };
 
 struct DecimalMap : public Matrix {
   std::vector<DecimalMapBlock*> blocks;
   explicit DecimalMap(Size n_blocks);
   ~DecimalMap();
+  void deleteBlock(Size idx);
 };
 
 struct FilteredDecimalVector : public Matrix {
   std::vector<FilteredDecimalVectorBlock*> blocks;
   explicit FilteredDecimalVector(Size n_blocks);
   ~FilteredDecimalVector();
+  void deleteBlock(Size idx);
 };
 
 struct FilteredBitmap : public Matrix {
   std::vector<FilteredBitmapBlock*> blocks;
   explicit FilteredBitmap(Size n_blocks);
   ~FilteredBitmap();
+  void deleteBlock(Size idx);
 };
 
 struct FilteredDecimalMap : public Matrix {
   std::vector<FilteredDecimalMapBlock*> blocks;
   explicit FilteredDecimalMap(Size n_blocks);
   ~FilteredDecimalMap();
+  void deleteBlock(Size idx);
 };
 
 }  // namespace engine

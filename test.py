@@ -51,7 +51,7 @@ def main(argv):
     exec_time = []
     memory = []
 
-    for i in range(100):
+    for i in range(20):
 
       dstat = subprocess.Popen(
         [DSTAT_DIR+"/dstat", "-m", "--noheaders", "--noupdate", "--nocolor", "--output", "la_memory_usage.csv"],
@@ -71,9 +71,8 @@ def main(argv):
       )
 
       # get query results
-      start = clock()
-      _ = execution.communicate(input=query.format(data_size))
-      end = clock()
+      output, _ = execution.communicate(input=query.format(data_size))
+      output_line_list = output.splitlines()
 
       # stop profiler
       time.sleep(2)
@@ -92,7 +91,7 @@ def main(argv):
 
 
       # calculate execution time
-      t_acc = float(end-start)
+      t_acc = float(output_line_list[-1])
       exec_time.append( t_acc )
 
       print t_acc

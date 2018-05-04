@@ -315,6 +315,6 @@ literal
 
 void
 yy::laq_parser::error(const yy::laq_parser::location_type& l,
-         const std::string& m) {
+                      const std::string& m) {
   driver->error(l, m);
 }

@@ -4,13 +4,16 @@
 #ifndef ENGINE_INCLUDE_FOLD_H_
 #define ENGINE_INCLUDE_FOLD_H_
 
-#include <vector>
 #include "include/block.hpp"
+#include "include/matrix.hpp"
 
 namespace engine {
 
 void sum(const FilteredDecimalVectorBlock& in,
          Decimal *acc);
+
+void sum(const FilteredDecimalMapBlock& in,
+         FilteredDecimalMapAcc *acc);
 
 }  // namespace engine
 

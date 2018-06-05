@@ -1,5 +1,7 @@
 CXX = g++
-CXX_TMP_FLAGS = -O3 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic -fopenmp -Werror
+#/usr/lib/llvm-6.0/bin/clang++
+CXX_TMP_FLAGS = -O2 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic -fopenmp
+#-Werror
 
 
 ifdef DATASET
@@ -26,6 +28,7 @@ ENGINE_OBJ = $(ENGINE_DIR)/build/block.o \
 			 $(ENGINE_DIR)/build/dot.o \
 			 $(ENGINE_DIR)/build/filter.o \
 			 $(ENGINE_DIR)/build/fold.o \
+			 $(ENGINE_DIR)/build/functions.o \
 			 $(ENGINE_DIR)/build/krao.o \
 			 $(ENGINE_DIR)/build/lift.o \
 			 $(ENGINE_DIR)/build/matrix.o \
@@ -35,7 +38,11 @@ ENGINE_OBJ = $(ENGINE_DIR)/build/block.o \
 
 all: engine laq
 
-engine: $(ENGINE_DIR)/build $(ENGINE_DIR)/bin/q6 $(ENGINE_DIR)/bin/load
+engine: $(ENGINE_DIR)/build \
+		$(ENGINE_DIR)/bin/load \
+		$(ENGINE_DIR)/bin/q3 \
+		$(ENGINE_DIR)/bin/q6 \
+		$(ENGINE_DIR)/bin/q14
 
 laq: $(LAQ_DIR)/build $(LAQ_DIR)/bin/test_laq
 
@@ -72,12 +79,16 @@ $(LAQ_DIR)/bin/test_laq: $(LAQ_DIR)/test/test_laq.cpp \
 						 libgtest.a
 	$(CXX) $(CXXFLAGS) -isystem $(GTEST_DIR) -pthread $^ -o $@ -I $(LAQ_DIR) -I $(ENGINE_DIR)
 
+$(ENGINE_DIR)/bin/load: data/tpch_createDB.cpp $(ENGINE_OBJ)
+	$(CXX) $(CXXFLAGS) -I $(ENGINE_DIR) -o $@ $^
 
+$(ENGINE_DIR)/bin/q3: queries/cpp/3.cpp $(ENGINE_OBJ)
+	$(CXX) $(CXXFLAGS) -I $(ENGINE_DIR) -o $@ $^
 
 $(ENGINE_DIR)/bin/q6: queries/cpp/6.cpp $(ENGINE_OBJ)
 	$(CXX) $(CXXFLAGS) -I $(ENGINE_DIR) -o $@ $^
 
-$(ENGINE_DIR)/bin/load: data/tpch_createDB.cpp $(ENGINE_OBJ)
+$(ENGINE_DIR)/bin/q14: queries/cpp/14.cpp $(ENGINE_OBJ)
 	$(CXX) $(CXXFLAGS) -I $(ENGINE_DIR) -o $@ $^
 
 
@@ -129,6 +140,9 @@ $(ENGINE_DIR)/build/filter.o: $(ENGINE_DIR)/src/filter.cpp
 	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
 
 $(ENGINE_DIR)/build/fold.o: $(ENGINE_DIR)/src/fold.cpp
+	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
+
+$(ENGINE_DIR)/build/functions.o: $(ENGINE_DIR)/src/functions.cpp
 	$(CXX) $(CXXFLAGS) -c $< -I $(ENGINE_DIR) -I $(CEREAL) -o $@
 
 $(ENGINE_DIR)/build/krao.o: $(ENGINE_DIR)/src/krao.cpp

@@ -3,14 +3,14 @@
  */
 
 A = filter( lineitem.shipdate >= "1995-09-01" AND lineitem.shipdate < "1995-10-01") // 1 <-- #l
-B = map( lineitem.extendedprice*(1-lineitem.discount) )                             // 1 <-- #l
+B = lift( lineitem.extendedprice * (1 - lineitem.discount) )                        // 1 <-- #l
 C = hadamard( A, B )							                                    // 1 <-- #l
-D = filter( match( part.type , ".+PROMO.+" ) )                                      // 1 <-- #p
+D = filter( match( part.type , "PROMO.*" ) )                                        // 1 <-- #p
 E = dot( D, lineitem.partkey )                                                      // 1 <-- #l
 F = hadamard( C, E )                                                                // 1 <-- #l
-G = sum( C )                                                                        // 1 <-- 1
-H = sum( F )                                                                        // 1 <-- 1
-I = map( 100.00 * H / G )                                                           // 1 <-- 1
+G = sum( F )                                                                        // 1 <-- 1
+H = sum( C )                                                                        // 1 <-- 1
+I = lift( 100.00 * G / H )                                                          // 1 <-- 1
 return ( I )                                                                        // RESULT
 
 /** Expected result:
@@ -18,3 +18,15 @@ return ( I )                                                                    
   * PROMO_REVENUE
   * 16.38
   */
+
+/*
+A = Filtered Bit Vector
+B = Decimal Vector
+C = Filtered Decimal Vector
+D = Filtered Bit Vector
+E = Filtered Bit Vector
+F = Filtered Decimal Vector
+G = Decimal
+H = Decimal
+I = Decimal
+*/

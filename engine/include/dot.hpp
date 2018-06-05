@@ -14,6 +14,10 @@ void dot(const FilteredBitVector& A,
          const BitmapBlock& B,
          FilteredBitVectorBlock *C);
 
+void dot(const FilteredBitmap& A,
+         const BitmapBlock& B,
+         FilteredBitmapBlock *C);
+
 }  // namespace engine
 
 #endif  // ENGINE_INCLUDE_DOT_H_

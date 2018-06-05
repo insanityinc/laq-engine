@@ -53,15 +53,21 @@ class driver::ParsingTree {
   std::pair<std::string, std::string>
   declareTmpVars(MatrixTypeMap& matTypeMap,
                  AttributeTypes& attrTypes,
+                 AttributeAlloc& attrAlloc,
                  const std::string& var);
-
+  std::string
+  declareAttrVars(AttributeTypes& attrTypes,
+                  AttributeAlloc& attrAlloc,
+                  const std::string& var);
   std::string
   predicates(AttributeTypes& attrTypes,
+             AttributeAlloc& attrAlloc,
              const std::string& var);
 
-  AttributeAlloc
+  void
   getAttrAlloc(MatrixTypeMap& matTypeMap,
                AttributeTypes& attrTypes,
+               AttributeAlloc& attrAlloc,
                const std::string& var);
 
   class Statement;

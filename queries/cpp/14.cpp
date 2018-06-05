@@ -1,218 +1,186 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights reserved.
- * Example of C++ main function
- * TPC-H Query 14
+ * Copyright (c) 2018 João Afonso. All rights reserved.
  *
- * Query in SQL format:
- *
- *  select
- *    100.00 * sum(case
- *      when p_type like 'PROMO%'
- *        then l_extendedprice * (1 - l_discount)
- *      else 0
- *    end) / sum(l_extendedprice * (1 - l_discount)) as promo_revenue
- *  from
- *    lineitem,
- *    part
- *  where
- *    l_partkey = p_partkey
- *    and l_shipdate >= date ''
- *    and l_shipdate < date '' + interval '1' month;
- *
- * Query in DSL format:
- *
- *  A = filter( match( p.type , ".+PROMO.+" ) )
- *  B = dot( A, l.partkey )
- *  C = filter( l.shipdate >= "" )
- *  D = filter( l.shipdate < "" )
- *  E = hadamard( C, D )
- *  F = hadamard( B, E )
- *  G = map( l.extendedprice*(1-l.discount) )
- *  H = hadamard( F, G )
- *  I = sum( G )
- *  J = sum( H )
- *  K = map( 100.00 * J / I )
- *  return ( K )
- *
- * Query dependence graph:
- *
- *  p.type --> A --
- *                 |--> B ---------
- *  l.partkey -----                |
- *                                 |--> F --
- *                --> C --         |        |
- *  l.shipdate --|        |--> E --         |
- *                --> D --                  |--> H --> J --
- *                                          |              |
- *  l.extendedprice --                      |              |--> K
- *                    |--> G ---------------               |
- *  l.discount -------         |                           |
- *                              --> I ---------------------
+ * This query was automatically generated
  */
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <vector>
+#include "include/block.hpp"
+#include "include/database.hpp"
+#include "include/dot.hpp"
+#include "include/filter.hpp"
+#include "include/fold.hpp"
+#include "include/functions.hpp"
+#include "include/krao.hpp"
+#include "include/lift.hpp"
+#include "include/matrix.hpp"
+#include "include/types.hpp"
 
-inline bool filter_a(auto p_type) {
-  return match(p_type, ".+PROMO.+");
+inline bool filter_var_a(std::vector<engine::Literal> args){
+  return args[0]>="1995-09-01"&&args[0]<"1995-10-01";
 }
-
-inline bool filter_c(auto l_shipdate) {
-  return l_shipdate >= "1995-09-01";
+inline engine::Decimal lift_var_b(std::vector<engine::Decimal> args) {
+  return args[0]*(1-args[1]);
 }
-
-inline bool filter_d(auto l_shipdate) {
-  return l_shipdate < "1995-10-01";
+inline bool filter_var_d(std::vector<engine::Literal> args){
+  return match(args[0],"PROMO.*");
 }
-
-inline auto map_g(auto l_extendedprice, auto l_discount) {
-  return l_extendedprice * (1 - l_discount);
-}
-
-inline auto map_k(auto j, auto i) {
-  return 100.00 * j / i;
+inline engine::Decimal lift_var_i(std::vector<engine::Decimal> args) {
+  return 100.00*args[0]/args[1];
 }
 
 int main() {
-  /** Como B depende de A, calcula-se A
-    * Pré-condição: --
-    * Pós-condição: A calculado e guardado na RAM
-    */
+  auto start = std::chrono::high_resolution_clock::now();
 
-  // in:
-  Matrix p_type;
-  // out:
-  Matrix a;
+  engine::Database db(
+    "data/la",
+    "TPCH_1",
+    false);
 
-  for (int i = 0; i < p_type.n_blocks; ++i) {
-    p_type.load(i);
-    filter(/*filter:*/ filter_a,
-           /*in:*/ p_type.blocks[i],
-           /*out:*/ a.blocks[i]);
-    p_type.delete(i);
+  engine::Bitmap *var_lineitem_shipdate =
+    new engine::Bitmap(db.data_path,
+      db.database_name,
+      "lineitem",
+      "shipdate");
+  engine::DecimalVector *var_lineitem_extendedprice =
+    new engine::DecimalVector(db.data_path,
+      db.database_name,
+      "lineitem",
+      "extendedprice");
+  engine::DecimalVector *var_lineitem_discount =
+    new engine::DecimalVector(db.data_path,
+      db.database_name,
+      "lineitem",
+      "discount");
+  engine::Bitmap *var_part_type =
+    new engine::Bitmap(db.data_path,
+      db.database_name,
+      "part",
+      "type");
+  engine::Bitmap *var_lineitem_partkey =
+    new engine::Bitmap(db.data_path,
+      db.database_name,
+      "lineitem",
+      "partkey");
+
+  engine::FilteredBitVector *var_a_pred =
+    new engine::FilteredBitVector(var_lineitem_shipdate->nLabelBlocks);
+  engine::FilteredBitVector *var_a =
+    new engine::FilteredBitVector(var_lineitem_shipdate->nBlocks);
+  engine::DecimalVector *var_b =
+    new engine::DecimalVector(var_lineitem_extendedprice->nBlocks);
+  engine::FilteredDecimalVector *var_c =
+    new engine::FilteredDecimalVector(var_a->nBlocks);
+  engine::FilteredBitVector *var_d_pred =
+    new engine::FilteredBitVector(var_part_type->nLabelBlocks);
+  engine::FilteredBitVector *var_d =
+    new engine::FilteredBitVector(var_part_type->nBlocks);
+  engine::FilteredBitVector *var_e =
+    new engine::FilteredBitVector(var_lineitem_partkey->nBlocks);
+  engine::FilteredDecimalVector *var_f =
+    new engine::FilteredDecimalVector(var_c->nBlocks);
+  engine::Decimal *var_g =
+    new engine::Decimal();
+  engine::Decimal *var_h =
+    new engine::Decimal();
+  engine::Decimal *var_i =
+    new engine::Decimal();
+
+  for (engine::Size i = 0; i < var_lineitem_shipdate->nLabelBlocks; ++i) {
+    var_lineitem_shipdate->loadLabelBlock(i);
+    var_a_pred->blocks[i] = new engine::FilteredBitVectorBlock();
+    filter(filter_var_a,
+      {
+        *(var_lineitem_shipdate->labels[i])
+      },
+      var_a_pred->blocks[i]);
+    var_lineitem_shipdate->deleteLabelBlock(i);
   }
 
-
-  /** Pode calcular-se H em stream, mas como I depende de G, calcular G
-    * Pré-condição: --
-    * Pós-condição: G calculado e guardado na RAM
-    */
-
-  // in:
-  Matrix l_extendedprice, l_discount;
-  // out:
-  Matrix g;
-
-  for (int i = 0; i < l_discount.n_blocks; ++i) {
-    // load:
-    l_extendedprice.load(i);
-    l_discount.load(i);
-    // compute:
-    map(/*map:*/ map_g,
-        /*out:*/ g.blocks[i],
-        /*arguments:*/ l_extendedprice.blocks[i], l_discount.blocks[i]);
-    // delete:
-    l_extendedprice.delete(i);
-    l_discount.delete(i);
+  for (engine::Size i = 0; i < var_part_type->nLabelBlocks; ++i) {
+    var_part_type->loadLabelBlock(i);
+    var_d_pred->blocks[i] = new engine::FilteredBitVectorBlock();
+    filter(filter_var_d,
+      {
+        *(var_part_type->labels[i])
+      },
+      var_d_pred->blocks[i]);
+    var_part_type->deleteLabelBlock(i);
   }
 
-
-  /** J depende de H, calcular H com stream de B,C e D
-    * Pré-condição: A e G em RAM
-    * Pós-condição: H calculado e guardado na RAM, A apagado
-    */
-
-  // in:
-  Matrix l_partkey, l_shipdate;
-  // tmp:
-  Matrix b, c, d, e, f;
-  // out:
-  Matrix h;
-
-  for (int i = 0; i < l_partkey.n_blocks; ++i) {
-    // load:
-    l_partkey.load(i);
-    l_shipdate.load(i);
-    // compute:
-    dot(a, l_partkey.blocks[i], b.blocks[i]);
-    filter(/*filter:*/ filter_c,
-           /*in:*/ l_shipdate.blocks[i],
-           /*out:*/ c.blocks[i]);
-    filter(/*filter:*/ filter_d,
-           /*in:*/ l_shipdate.blocks[i],
-           /*out:*/ d.blocks[i]);
-    hadamard(/*in:*/ c.blocks[i], d.blocks[i],
-             /*out:*/ d.blocks[i]);
-    hadamard(/*in:*/ b.blocks[i], e.blocks[i],
-             /*out:*/ f.blocks[i]);
-    hadamard(/*in:*/ f.blocks[i], g.blocks[i],
-             /*out:*/ h.blocks[i]);
-    // delete:
-    l_partkey.delete(i);
-    l_shipdate.delete(i);
-    b.delete(i);
-    c.delete(i);
-    d.delete(i);
-    e.delete(i);
-    f.delete(i);
+  for(engine::Size i = 0; i < var_part_type->nBlocks; ++i) {
+    var_part_type->loadBlock(i);
+    var_d->blocks[i] = new engine::FilteredBitVectorBlock();
+    dot(*var_d_pred, *(var_part_type->blocks[i]), var_d->blocks[i]);
+    var_part_type->deleteBlock(i);
   }
 
-  a.deleteAll();
+  delete var_d_pred;
 
+  for(engine::Size i = 0; i < var_lineitem_shipdate->nBlocks; ++i) {
+    var_lineitem_shipdate->loadBlock(i);
+    var_a->blocks[i] = new engine::FilteredBitVectorBlock();
+    dot(*var_a_pred, *(var_lineitem_shipdate->blocks[i]), var_a->blocks[i]);
+    var_lineitem_shipdate->deleteBlock(i);
+    var_lineitem_extendedprice->loadBlock(i);
+    var_lineitem_discount->loadBlock(i);
+    var_b->blocks[i] = new engine::DecimalVectorBlock();
+    lift(lift_var_b,
+      {
+        *(var_lineitem_extendedprice->blocks[i]),
+        *(var_lineitem_discount->blocks[i])
+      },
+      var_b->blocks[i]);
+    var_lineitem_extendedprice->deleteBlock(i);
+    var_lineitem_discount->deleteBlock(i);
 
-  /** Calcular J e libertar H (ou calcular I e libertar G)
-    * Pré-condição: H em RAM
-    * Pós-condição: J calculado e guardado na RAM, H apagado
-    */
+    var_c->blocks[i] = new engine::FilteredDecimalVectorBlock();
+    krao(*(var_a->blocks[i]), *(var_b->blocks[i]), var_c->blocks[i]);
+    var_a->deleteBlock(i);
+    var_b->deleteBlock(i);
 
-  // in: --
-  // out:
-  Matrix j;
+    var_lineitem_partkey->loadBlock(i);
+    var_e->blocks[i] = new engine::FilteredBitVectorBlock();
+    dot(*var_d, *(var_lineitem_partkey->blocks[i]), var_e->blocks[i]);
+    var_lineitem_partkey->deleteBlock(i);
 
-  // load: --
-  // compute:
-  sum(/*in:*/ h,
-      /*out:*/ j);
-  // delete:
-  h.deleteAll();
+    var_f->blocks[i] = new engine::FilteredDecimalVectorBlock();
+    krao(*(var_c->blocks[i]), *(var_e->blocks[i]), var_f->blocks[i]);
+    var_e->deleteBlock(i);
 
+    sum(*var_f->blocks[i], var_g);
+    var_f->deleteBlock(i);
 
-  /** Calcular I e libertar G (ou calcular J e libertar H)
-    * Pré-condição: G em RAM
-    * Pós-condição: I calculado e guardado na RAM, G apagado
-    */
-
-  // in: --
-  // out:
-  Matrix i;
-
-  // load: --
-  // compute:
-  sum(/*in:*/ g,
-      /*out:*/ i);
-  // delete:
-  g.deleteAll();
-
-
-  /** Calcular K e libertar I e J
-    * Pré-condição: I e J em RAM
-    * Pós-condição: K calculado e guardado na RAM, I e J apagados
-    */
-
-  // in: --
-  // out:
-  Matrix k;
-
-  for (int i = 0; i < j.n_blocks; ++i) {
-    // load: --
-    // compute:
-    map(/*map:*/ map_k,
-        /*out:*/ k.blocks[i],
-        /*arguments:*/ j.blocks[i], i.blocks[i]);
-    // delete:
+    sum(*var_c->blocks[i], var_h);
+    var_c->deleteBlock(i);
   }
 
-  i.deleteAll();
-  j.deleteAll();
+  delete var_a_pred;
+  delete var_d;
 
-  // Print or store K
+
+  (*var_i) = lift_var_i(
+      {
+        *(var_g),
+        *(var_h)
+      });
+
+  std::cout << (*var_i) << std::endl;
+
+  delete var_g;
+
+  delete var_h;
+
+  delete var_i;
+
+  auto end = std::chrono::high_resolution_clock::now();
+  std::cout
+    << "Completed in "
+    << std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count()
+    << " ns"
+    << std::endl;
 
   return 0;
 }

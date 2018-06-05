@@ -147,6 +147,14 @@ struct FilteredDecimalMap : public Matrix {
   void deleteBlock(Size idx);
 };
 
+struct FilteredDecimalMapAcc {
+  std::map<MultiPrecision,Decimal> map;
+  //explicit FilteredDecimalMap(Size n_blocks);
+  //~FilteredDecimalMap();
+  //void deleteBlock(Size idx);
+  FilteredDecimalMap getMatrix();
+};
+
 }  // namespace engine
 
 #endif  // ENGINE_INCLUDE_MATRIX_H_

@@ -74,7 +74,7 @@ laquery
   ;
 
 statement
-  : IDENTIFIER '=' product '(' ident ',' ident ')'        { if(driver->var_exists(*$1))
+  : IDENTIFIER EQ product '(' ident ',' ident ')'         { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             driver->insertStatement(*$1, *$3, std::vector<std::string> {*$5, *$7});
@@ -83,7 +83,7 @@ statement
                                                             delete $5;
                                                             delete $7;
                                                           }
-  | IDENTIFIER '=' bang '(' ident ')'                     { if(driver->var_exists(*$1))
+  | IDENTIFIER EQ bang '(' ident ')'                      { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             driver->insertStatement(*$1, *$3, std::vector<std::string> {*$5});
@@ -91,7 +91,7 @@ statement
                                                             delete $3;
                                                             delete $5;
                                                           }
-  | IDENTIFIER '=' FILTER '(' expression ')'              { if(driver->var_exists(*$1))
+  | IDENTIFIER EQ FILTER '(' expression ')'               { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             std::vector<std::string> expvars = driver->clear_exp_vars();
@@ -99,7 +99,7 @@ statement
                                                             delete $1;
                                                             delete $5;
                                                           }
-  | IDENTIFIER '=' LIFT '(' expression ')'                 { if(driver->var_exists(*$1))
+  | IDENTIFIER EQ LIFT '(' expression ')'                 { if(driver->var_exists(*$1))
                                                               driver->error("Error: Redeclared variable " + *$1);
                                                             driver->add_var(*$1);
                                                             std::vector<std::string> expvars = driver->clear_exp_vars();

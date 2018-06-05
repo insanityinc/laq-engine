@@ -57,6 +57,7 @@ std::string header() {
          "#include \"include/dot.hpp\"\n"
          "#include \"include/filter.hpp\"\n"
          "#include \"include/fold.hpp\"\n"
+         "#include \"include/functions.hpp\"\n"
          "#include \"include/krao.hpp\"\n"
          "#include \"include/lift.hpp\"\n"
          "#include \"include/matrix.hpp\"\n"
@@ -69,6 +70,11 @@ MatrixTypeMap getMatrixTypeMap() {
   MatrixTypeMap matTypeMap = {
     {std::make_tuple("", "", ""), ""},
 
+    {std::make_tuple("dot", "FilteredBitVector", "Bitmap"),
+      "FilteredBitVector"},
+    {std::make_tuple("dot", "FilteredBitmap", "Bitmap"),
+      "FilteredBitmap"},
+
     {std::make_tuple("filter", "Bitmap", ""), "FilteredBitVector"},
     {std::make_tuple("filter", "DecimalVector", ""), "FilteredBitVector"},
 
@@ -76,11 +82,33 @@ MatrixTypeMap getMatrixTypeMap() {
       "FilteredBitVector"},
     {std::make_tuple("hadamard", "FilteredBitVector", "DecimalVector"),
       "FilteredDecimalVector"},
+    {std::make_tuple("hadamard", "FilteredDecimalVector", "FilteredBitVector"),
+      "FilteredDecimalVector"},
+
+    {std::make_tuple("krao", "FilteredBitVector", "FilteredBitVector"),
+      "FilteredBitVector"},
+    {std::make_tuple("krao", "FilteredBitVector", "DecimalVector"),
+      "FilteredDecimalVector"},
+    {std::make_tuple("krao", "FilteredDecimalVector", "FilteredBitVector"),
+      "FilteredDecimalVector"},
+    {std::make_tuple("krao", "FilteredBitVector", "Bitmap"),
+      "FilteredBitmap"},
+    {std::make_tuple("krao", "FilteredBitmap", "Bitmap"),
+      "FilteredBitmap"},
+    {std::make_tuple("krao", "Bitmap", "FilteredBitmap"),
+      "FilteredBitmap"},
+    {std::make_tuple("krao", "FilteredBitmap", "FilteredBitVector"),
+      "FilteredBitmap"},
+    {std::make_tuple("krao", "FilteredBitmap", "DecimalVector"),
+      "FilteredDecimalMap"},
 
     {std::make_tuple("lift", "DecimalVector", ""), "DecimalVector"},
     {std::make_tuple("lift", "DecimalVector", "DecimalVector"),
       "DecimalVector"},
-    {std::make_tuple("sum", "FilteredDecimalVector", ""), "Decimal"}
+    {std::make_tuple("lift", "Decimal", "Decimal"), "Decimal"},
+
+    {std::make_tuple("sum", "FilteredDecimalVector", ""), "Decimal"},
+    {std::make_tuple("sum", "FilteredDecimalMap", ""), "FilteredDecimalMap"}
   };
 
   return matTypeMap;
@@ -89,9 +117,9 @@ MatrixTypeMap getMatrixTypeMap() {
 std::string normalizeVar(std::string var) {
   auto dot = var.find(".");
   if (dot != std::string::npos) {
-    return var.replace(dot, 1, "_");
+    return "var_" + var.replace(dot, 1, "_");
   }
-  return var;
+  return "var_" + var;
 }
 
 bool isFold(std::string op) {
@@ -122,7 +150,7 @@ std::string makeFilterPredicate(std::string type,
                                 std::string exp)
 {
   std::string out;
-  out += "inline bool filter_" + var + "(std::vector<engine::";
+  out += "inline bool filter_var_" + var + "(std::vector<engine::";
   if (type == "Bitmap") {
     out += "Literal";
   } else {
@@ -139,7 +167,7 @@ std::string makeLiftPredicate(std::string var,
                               std::string exp)
 {
   std::string out;
-  out += "inline engine::Decimal lift_" + var +
+  out += "inline engine::Decimal lift_var_" + var +
          "(std::vector<engine::Decimal> args) {\n";
   out += "  return " + exp + ";\n";
   out += "}\n";
@@ -149,23 +177,32 @@ std::string makeLiftPredicate(std::string var,
 
 std::string
 driver::ParsingTree::predicates(AttributeTypes& attrTypes,
-                                const std::string& var)
-{
+                                AttributeAlloc& attrAlloc,
+                                const std::string& var) {
   std::string out;
-
   if (attrTypes.find(var) == attrTypes.end()) {
+
     auto& rvars = tree.at(var).rightvars;
     auto& op = tree.at(var).operation;
     auto& exp = tree.at(var).expression;
 
     for (const auto& attr : rvars) {
-      out += predicates(attrTypes, attr);
+      out += predicates(attrTypes, attrAlloc, attr);
     }
 
-    if (op == "filter") {
-      return out + makeFilterPredicate(attrTypes.at(rvars.at(0)), var, exp);
-    } else if (op == "lift") {
-      return out + makeLiftPredicate(var, exp);
+    if (var != "$$") {
+
+      auto& count = std::get<2>(attrAlloc.at(var));
+      if (count == 0) {
+        count++;
+
+        if (op == "filter") {
+          out += makeFilterPredicate(attrTypes.at(rvars.at(0)), var, exp);
+        } else if (op == "lift") {
+          out += makeLiftPredicate(var, exp);
+        }
+
+      }
     }
   }
   return out;
@@ -173,8 +210,7 @@ driver::ParsingTree::predicates(AttributeTypes& attrTypes,
 
 std::string getTmpDeclaration(const std::string& type,
                               const std::string& var,
-                              std::string rightvar)
-{
+                              std::string rightvar) {
   std::string out;
 
   out += "  engine::" + type + " *" + normalizeVar(var) + " =\n";
@@ -189,16 +225,15 @@ std::string getTmpDeclaration(const std::string& type,
 
 std::string getDimensionFilterDeclaration(const std::string& type,
                                           const std::string& var,
-                                          std::string rightvar)
-{
+                                          std::string rightvar) {
   std::string out;
   auto dot = rightvar.find(".");
   if (dot != std::string::npos) {
-    rightvar = rightvar.replace(dot, 1, "_");
+    rightvar = "var_" + rightvar.replace(dot, 1, "_");
   }
-  out += "  engine::" + type + " *" + var + "_pred =\n";
+  out += "  engine::" + type + " *var_" + var + "_pred =\n";
   out += "    new engine::" + type + "(" + rightvar + "->nLabelBlocks);\n";
-  out += "  engine::" + type + " *" + var + " =\n";
+  out += "  engine::" + type + " *var_" + var + " =\n";
   out += "    new engine::" + type + "(" + rightvar + "->nBlocks);\n";
   return out;
 }
@@ -206,13 +241,13 @@ std::string getDimensionFilterDeclaration(const std::string& type,
 std::pair<std::string, std::string>
 driver::ParsingTree::declareTmpVars(MatrixTypeMap& matTypeMap,
                                     AttributeTypes& attrTypes,
-                                    const std::string& var)
-{
+                                    AttributeAlloc& attrAlloc,
+                                    const std::string& var) {
   if (var == "$$") {
     std::string cpp;
     for (const auto& attr : tree.at(var).rightvars) {
       cpp += driver::ParsingTree::declareTmpVars(
-        matTypeMap, attrTypes, attr).second;
+        matTypeMap, attrTypes, attrAlloc, attr).second;
     }
     return std::make_pair("", cpp);
   }
@@ -222,42 +257,48 @@ driver::ParsingTree::declareTmpVars(MatrixTypeMap& matTypeMap,
     return std::make_pair(tp, "");
   }
 
-  std::string op = tree.at(var).operation;
-  std::vector<std::pair<std::string, std::string>> calls;
+  auto& count = std::get<2>(attrAlloc.at(var));
 
-  std::vector<std::string>& v = tree.at(var).rightvars;
-
-  engine::Size i = 0;
-  for (i = 0; i < v.size(); ++i) {
-    calls.push_back(
-      driver::ParsingTree::declareTmpVars(matTypeMap, attrTypes, v[i])
-    );
-  }
-  for (; i < 2; ++i) {
-    calls.push_back(std::make_pair("",""));
-  }
-
-  std::string type = matTypeMap.at(
-    std::make_tuple(op, calls.at(0).first, calls.at(1).first)
-  );
-  // store type somewhere
-
+  std::string type = std::get<0>(attrAlloc.at(var));
   std::string cpp;
-  for (i = 0; i < v.size(); ++i) {
-    cpp += calls.at(i).second;
+
+  if (count == 0) {
+    count++;
+
+    std::string op = tree.at(var).operation;
+    std::vector<std::pair<std::string, std::string>> calls;
+
+    std::vector<std::string>& v = tree.at(var).rightvars;
+
+    engine::Size i = 0;
+    for (i = 0; i < v.size(); ++i) {
+      calls.push_back(
+        driver::ParsingTree::declareTmpVars(matTypeMap, attrTypes,
+                                            attrAlloc, v[i])
+      );
+    }
+
+    // store type somewhere
+
+    for (i = 0; i < v.size(); ++i) {
+      cpp += calls.at(i).second;
+    }
+
+    if (op == "filter" && calls.at(0).first == "Bitmap") {
+      cpp += getDimensionFilterDeclaration(type, var, v[0]);
+    } else if (isFold(op)) {
+        if (type != "Decimal") {
+          cpp += "  engine::" + type + "Acc *" + normalizeVar(var) + "_acc =\n";
+          cpp += "    new engine::" + type + "Acc();\n";
+        }
+        cpp += getTmpDeclaration(type, var, v[0]);
+    } else if (op == "dot") {
+      cpp += getTmpDeclaration(type, var, v[1]);
+    } else {
+      cpp += getTmpDeclaration(type, var, v[0]);
+    }
   }
 
-  if (op == "filter" && calls.at(0).first == "Bitmap") {
-    cpp += getDimensionFilterDeclaration(type, var, v[0]);
-  } else {
-    if (isFold(op)) {
-      if (type != "Decimal") {
-        cpp += "  engine::" + type + "Acc *" + normalizeVar(var) + "_acc =\n";
-        cpp += "    new engine::" + type + "Acc();\n";
-      }
-    }
-    cpp += getTmpDeclaration(type, var, v[0]);
-  }
   return std::make_pair(type, cpp);
 }
 
@@ -265,7 +306,7 @@ std::string getAttrDeclaration(std::string type, std::string var) {
   std::string out;
   auto dot = var.find(".");
 
-  out += "  engine::" + type + " *" + var.replace(dot, 1, "_") + " =\n";
+  out += "  engine::" + type + " *var_" + var.replace(dot, 1, "_") + " =\n";
   out += "    new engine::" + type + "(db.data_path,\n";
   out += "      db.database_name,\n";
   out += "      \"" + var.substr(0, dot) + "\",\n";
@@ -275,10 +316,19 @@ std::string getAttrDeclaration(std::string type, std::string var) {
 }
 
 std::string
-declareAttrVars(AttributeTypes& attrTypes) {
+driver::ParsingTree::declareAttrVars(AttributeTypes& attrTypes,
+                                     AttributeAlloc& attrAlloc,
+                                     const std::string& var) {
   std::string out;
-  for (const auto& attr : attrTypes) {
-    out += getAttrDeclaration(attr.second, attr.first);
+
+  auto attr = attrTypes.find(var);
+  if (attr == attrTypes.end()) {
+    for (const auto& rvar : tree.at(var).rightvars) {
+      out += declareAttrVars(attrTypes, attrAlloc, rvar);
+    }
+  } else if (std::get<2>(attrAlloc.at(var)) == 0) {
+    std::get<2>(attrAlloc.at(var))++;
+    out += getAttrDeclaration(attr->second, attr->first);
   }
   return out;
 }
@@ -294,17 +344,27 @@ void mergeAttributeMaps(AttributeAlloc& base, const AttributeAlloc& tmp) {
   }
 }
 
-AttributeAlloc
+void insertAttr(AttributeAlloc& attrAlloc,
+                const std::string& var,
+                std::tuple<std::string, engine::Size, engine::Size> tuple) {
+
+  if (attrAlloc.find(var) != attrAlloc.end()) {
+    std::get<1>(attrAlloc.at(var))++;
+  } else {
+    attrAlloc[var] = tuple;
+  }
+}
+
+void
 driver::ParsingTree::getAttrAlloc(MatrixTypeMap& matTypeMap,
                                   AttributeTypes& attrTypes,
-                                  const std::string& var)
-{
-  AttributeAlloc out;
+                                  AttributeAlloc& attrAlloc,
+                                  const std::string& var) {
 
   if (attrTypes.find(var) != attrTypes.end()) {
     std::string type = attrTypes.at(var);
-    out[var] = std::make_tuple(type, 1, 0);
-    return out;
+    insertAttr(attrAlloc, var, std::make_tuple(type, 1, 0));
+    return;
   }
 
   if (var != "$$") {
@@ -313,10 +373,15 @@ driver::ParsingTree::getAttrAlloc(MatrixTypeMap& matTypeMap,
     std::vector<std::string> calls;
 
     for (const auto& attr : tree.at(var).rightvars) {
-      AttributeAlloc tmp = driver::ParsingTree::getAttrAlloc(
-        matTypeMap, attrTypes, attr);
-      mergeAttributeMaps(out, tmp);
-      calls.push_back( std::get<0>(tmp.at(attr)) );
+
+      if (attrAlloc.find(attr) != attrAlloc.end()) {
+        insertAttr(attrAlloc, attr, std::make_tuple("", 1, 0));
+      } else {
+        driver::ParsingTree::getAttrAlloc(
+          matTypeMap, attrTypes, attrAlloc, attr);
+      }
+
+      calls.push_back( std::get<0>(attrAlloc.at(attr)) );
     }
     for (engine::Size i = tree.at(var).rightvars.size(); i < 2; ++i) {
       calls.push_back("");
@@ -326,17 +391,13 @@ driver::ParsingTree::getAttrAlloc(MatrixTypeMap& matTypeMap,
       std::make_tuple(op, calls.at(0), calls.at(1))
     );
 
-    out[var] = std::make_tuple(type, 1, 0);
+    insertAttr(attrAlloc, var, std::make_tuple(type, 1, 0));
   } else {
 
     for (const auto& attr : tree.at(var).rightvars) {
-      AttributeAlloc tmp = driver::ParsingTree::getAttrAlloc(
-        matTypeMap, attrTypes, attr);
-      mergeAttributeMaps(out, tmp);
+      driver::ParsingTree::getAttrAlloc(matTypeMap, attrTypes, attrAlloc, attr);
     }
   }
-
-  return out;
 }
 
 std::vector<driver::ParsingTree::ForLoop>
@@ -362,7 +423,10 @@ driver::ParsingTree::getForLoops(AttributeTypes& attrTypes,
     for (const auto& attr : rvars) {
       auto child_res = getForLoops(attrTypes, attrAlloc, attr);
       childs.push_back(child_res);
-      // add var usages
+
+    }
+    // add var usages
+    for (const auto& attr : rvars) {
       std::get<2>(attrAlloc.at(attr)) ++;
     }
     // merge init loops
@@ -396,7 +460,7 @@ driver::ParsingTree::getForLoops(AttributeTypes& attrTypes,
         }
 
         for(const auto& delVar : tmp.deleteVars) {
-          tmp.tail += "\n\n  delete " + delVar + ";";
+          tmp.tail += "\n\n  delete " + normalizeVar(delVar) + ";";
         }
 
         tmp.tail += "\n\n";
@@ -419,7 +483,7 @@ driver::ParsingTree::getForLoops(AttributeTypes& attrTypes,
           left_child.tail += "  }\n";
 
           for(const auto& delVar : left_child.deleteVars) {
-            left_child.tail += "\n  delete " + delVar + ";";
+            left_child.tail += "\n  delete " + normalizeVar(delVar) + ";";
           }
           left_child.tail += "\n\n";
 
@@ -487,11 +551,15 @@ driver::ParsingTree::getForLoops(AttributeTypes& attrTypes,
                         normalizeVar(rvars[0]) + "->blocks[i]), " +
                         normalizeVar(var) + "->blocks[i]);\n";
 
-        loopDot.tail += "    " + normalizeVar(rvars[0]) +
-                        "->deleteBlock(i);\n\n";
+        auto varInfo = attrAlloc.at(rvars[0]);
+
+        if (std::get<1>(varInfo) == std::get<2>(varInfo)) {
+          loopDot.tail += "    " + normalizeVar(rvars[0]) +
+                          "->deleteBlock(i);\n";
+        }
 
         // Add the predicate to the deleteVars
-        loopDot.deleteVars.push_back(normalizeVar(var) + "_pred");
+        loopDot.deleteVars.push_back(var + "_pred");
 
         out.push_back(loopDot);
 
@@ -522,15 +590,15 @@ driver::ParsingTree::getForLoops(AttributeTypes& attrTypes,
 
         if (type != "Decimal") {
           // acc to matrix
-          first.tail += "\n  " + normalizeVar(var) + " = " +
-                        normalizeVar(var) + "_acc.getMatrix();\n";
+          first.tail += "\n  (*" + normalizeVar(var) + ") = " +
+                        normalizeVar(var) + "_acc->getMatrix();\n";
           // delete acc
           first.tail += "\n  delete " + normalizeVar(var) + "_acc;\n";
         }
 
         // delete vars
         for(const auto& delVar : childs.at(0).back().deleteVars) {
-          first.tail += "\n  delete " + delVar + ";";
+          first.tail += "\n  delete " + normalizeVar(delVar) + ";";
         }
         first.tail += "\n";
 
@@ -578,13 +646,25 @@ driver::ParsingTree::getForLoops(AttributeTypes& attrTypes,
           } else { //if (op == "krao" || op == "hadamard")
 
             tmp.tail += "    krao(*(" + normalizeVar(rvars[0]) +
-                        "->blocks[i]), *(" + normalizeVar(rvars.size()>1 ? rvars[1] :rvars[0]) +
-                        "->blocks[i]), " + normalizeVar(var) + "->blocks[i]);";
+                        "->blocks[i]), *(" + normalizeVar(rvars[1]) +
+                        "->blocks[i]), " + normalizeVar(var) + "->blocks[i]";
+
+            // TODO(João) if "Map" in type(rvars)
+            std::string l_type = std::get<0>(attrAlloc.at(rvars[0]));
+            std::string r_type = std::get<0>(attrAlloc.at(rvars[1]));
+
+            if (l_type.find("ap") != std::string::npos &&
+                r_type.find("ap") != std::string::npos) {
+              tmp.tail += ", " + normalizeVar(rvars[1]) + "->nrows";
+            }
+
+            tmp.tail += ");";
           }
 
           // add delete right block to right loop
           for (const auto& rvar : rvars) {
             auto varInfo = attrAlloc.at(rvar);
+
             if (std::get<1>(varInfo) == std::get<2>(varInfo)) {
               tmp.tail += "\n    " + normalizeVar(rvar) + "->deleteBlock(i);";
             }
@@ -600,17 +680,35 @@ driver::ParsingTree::getForLoops(AttributeTypes& attrTypes,
   return out;
 }
 
+void restoreAttrAllocCount(AttributeAlloc& attrAlloc) {
+  for(auto& attr: attrAlloc) {
+    std::get<2>(attr.second) = 0;
+  }
+}
+
 std::string
 driver::ParsingTree::toCpp(engine::Database& db) {
   std::string out;
   // -) Add Header comments
   out += copyright();
+
   // 1) Add the needed header files:
   out += header();
 
   // 2) Define the necessary predicates
   AttributeTypes attrTypes = getAttributeTypes(db);
-  out += predicates(attrTypes, "$$") + "\n";
+  MatrixTypeMap matTypeMap = getMatrixTypeMap();
+  AttributeAlloc attrAlloc;
+  getAttrAlloc(matTypeMap, attrTypes, attrAlloc, "$$");
+
+  for(const auto& attr: attrAlloc) {
+    std::cout << attr.first << ": "
+      << std::get<0>(attr.second) << " "
+      << std::get<1>(attr.second) << " "
+      << std::get<2>(attr.second) << std::endl;
+  }
+
+  out += predicates(attrTypes, attrAlloc, "$$") + "\n";
 
   // -) Open main function
   out += "int main() {\n";
@@ -623,22 +721,20 @@ driver::ParsingTree::toCpp(engine::Database& db) {
          "    false);\n\n";
 
   // 4) Load attributes metadata
-  out += declareAttrVars(attrTypes) + "\n";
+  restoreAttrAllocCount(attrAlloc);
+  out += declareAttrVars(attrTypes, attrAlloc, "$$") + "\n";
 
   // 5) Declare temporary matrices
-  MatrixTypeMap matTypeMap = getMatrixTypeMap();
-  AttributeAlloc attrAlloc = getAttrAlloc(matTypeMap, attrTypes, "$$");
-
   // TODO (João) modify declareTmpVars to use attrAlloc
+  restoreAttrAllocCount(attrAlloc);
   std::pair<std::string, std::string> tmpVars =
-    declareTmpVars(matTypeMap, attrTypes, "$$");
-
+    declareTmpVars(matTypeMap, attrTypes, attrAlloc, "$$");
   out += tmpVars.second + "\n";
 
   // 6) Build the for loops
+  restoreAttrAllocCount(attrAlloc);
   std::vector<driver::ParsingTree::ForLoop> loops =
     getForLoops(attrTypes, attrAlloc, "$$");
-
   for(const auto& loop : loops) {
     out += loop.head + loop.tail;
   }

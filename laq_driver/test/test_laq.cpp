@@ -7,6 +7,8 @@
 #include "include/database.hpp"
 #include "include/laq_driver.hpp"
 
+#include <iostream>
+
 TEST(laqParser, q6) {
   laq::driver d;
   ASSERT_FALSE(d.parse("queries/laq/6.laq"));
@@ -28,169 +30,40 @@ TEST(toCpp, q6) {
   ASSERT_TRUE(db.load());
   ASSERT_FALSE(d.parse("queries/laq/6.laq"));
 
-  // When complete read the cpp file
-  ASSERT_EQ(d.toCpp(db),
-    "/*\n"
-    " * Copyright (c) 2018 João Afonso. All rights reserved.\n"
-    " *\n"
-    " * This query was automatically generated\n"
-    " */\n"
-    "#include <chrono>\n"
-    "#include <iostream>\n"
-    "#include <string>\n"
-    "#include <vector>\n"
-    "#include \"include/block.hpp\"\n"
-    "#include \"include/database.hpp\"\n"
-    "#include \"include/dot.hpp\"\n"
-    "#include \"include/filter.hpp\"\n"
-    "#include \"include/fold.hpp\"\n"
-    "#include \"include/krao.hpp\"\n"
-    "#include \"include/lift.hpp\"\n"
-    "#include \"include/matrix.hpp\"\n"
-    "#include \"include/types.hpp\"\n"
-    "\n"
-    "inline bool filter_a(std::vector<engine::Literal> args){\n"
-    "  return args[0]>=\"1994-01-01\"&&args[0]<\"1995-01-01\";\n"
-    "}\n"
-    "inline bool filter_b(std::vector<engine::Decimal> args){\n"
-    "  return args[0]>=0.05&&args[0]<=0.07;\n"
-    "}\n"
-    "inline bool filter_d(std::vector<engine::Decimal> args){\n"
-    "  return args[0]<24;\n"
-    "}\n"
-    "inline engine::Decimal lift_f(std::vector<engine::Decimal> args) {\n"
-    "  return args[0]*args[1];\n"
-    "}\n"
-    "\n"
-    "int main() {\n"
-    "  auto start = std::chrono::high_resolution_clock::now();\n"
-    "\n"
-    "  engine::Database db(\n"
-    "    \"data/la\",\n"
-    "    \"TPCH_1\",\n"
-    "    false);\n"
-    "\n"
-    "  engine::DecimalVector *lineitem_discount =\n"
-    "    new engine::DecimalVector(db.data_path,\n"
-    "      db.database_name,\n"
-    "      \"lineitem\",\n"
-    "      \"discount\");\n"
-    "  engine::DecimalVector *lineitem_extendedprice =\n"
-    "    new engine::DecimalVector(db.data_path,\n"
-    "      db.database_name,\n"
-    "      \"lineitem\",\n"
-    "      \"extendedprice\");\n"
-    "  engine::DecimalVector *lineitem_quantity =\n"
-    "    new engine::DecimalVector(db.data_path,\n"
-    "      db.database_name,\n"
-    "      \"lineitem\",\n"
-    "      \"quantity\");\n"
-    "  engine::Bitmap *lineitem_shipdate =\n"
-    "    new engine::Bitmap(db.data_path,\n"
-    "      db.database_name,\n"
-    "      \"lineitem\",\n"
-    "      \"shipdate\");\n"
-    "\n"
-    "  engine::FilteredBitVector *a_pred =\n"
-    "    new engine::FilteredBitVector(lineitem_shipdate->nLabelBlocks);\n"
-    "  engine::FilteredBitVector *a =\n"
-    "    new engine::FilteredBitVector(lineitem_shipdate->nBlocks);\n"
-    "  engine::FilteredBitVector *b =\n"
-    "    new engine::FilteredBitVector(lineitem_discount->nBlocks);\n"
-    "  engine::FilteredBitVector *c =\n"
-    "    new engine::FilteredBitVector(a->nBlocks);\n"
-    "  engine::FilteredBitVector *d =\n"
-    "    new engine::FilteredBitVector(lineitem_quantity->nBlocks);\n"
-    "  engine::FilteredBitVector *e =\n"
-    "    new engine::FilteredBitVector(c->nBlocks);\n"
-    "  engine::DecimalVector *f =\n"
-    "    new engine::DecimalVector(lineitem_extendedprice->nBlocks);\n"
-    "  engine::FilteredDecimalVector *g =\n"
-    "    new engine::FilteredDecimalVector(e->nBlocks);\n"
-    "  engine::Decimal *h =\n"
-    "    new engine::Decimal();\n"
-    "\n"
-    "  for (engine::Size i = 0; i < lineitem_shipdate->nLabelBlocks; ++i) {\n"
-    "    lineitem_shipdate->loadLabelBlock(i);\n"
-    "    a_pred->blocks[i] = new engine::FilteredBitVectorBlock();\n"
-    "    filter(filter_a,\n"
-    "      {\n"
-    "        *(lineitem_shipdate->labels[i])\n"
-    "      },\n"
-    "      a_pred->blocks[i]);\n"
-    "    lineitem_shipdate->deleteLabelBlock(i);\n"
-    "  }\n"
-    "\n"
-    "  for(engine::Size i = 0; i < lineitem_shipdate->nBlocks; ++i) {\n"
-    "    lineitem_shipdate->loadBlock(i);\n"
-    "    a->blocks[i] = new engine::FilteredBitVectorBlock();\n"
-    "    dot(*a_pred, *(lineitem_shipdate->blocks[i]), a->blocks[i]);\n"
-    "    lineitem_shipdate->deleteBlock(i);\n"
-    "\n"
-    "    lineitem_discount->loadBlock(i);\n"
-    "    b->blocks[i] = new engine::FilteredBitVectorBlock();\n"
-    "    filter(filter_b,\n"
-    "      {\n"
-    "        *(lineitem_discount->blocks[i])\n"
-    "      },\n"
-    "      b->blocks[i]);\n"
-    "\n"
-    "    c->blocks[i] = new engine::FilteredBitVectorBlock();\n"
-    "    krao(*(a->blocks[i]), *(b->blocks[i]), c->blocks[i]);\n"
-    "    a->deleteBlock(i);\n"
-    "    b->deleteBlock(i);\n"
-    "\n"
-    "    lineitem_quantity->loadBlock(i);\n"
-    "    d->blocks[i] = new engine::FilteredBitVectorBlock();\n"
-    "    filter(filter_d,\n"
-    "      {\n"
-    "        *(lineitem_quantity->blocks[i])\n"
-    "      },\n"
-    "      d->blocks[i]);\n"
-    "    lineitem_quantity->deleteBlock(i);\n"
-    "\n"
-    "    e->blocks[i] = new engine::FilteredBitVectorBlock();\n"
-    "    krao(*(c->blocks[i]), *(d->blocks[i]), e->blocks[i]);\n"
-    "    c->deleteBlock(i);\n"
-    "    d->deleteBlock(i);\n"
-    "\n"
-    "    lineitem_extendedprice->loadBlock(i);\n"
-    "    f->blocks[i] = new engine::DecimalVectorBlock();\n"
-    "    lift(lift_f,\n"
-    "      {\n"
-    "        *(lineitem_extendedprice->blocks[i]),\n"
-    "        *(lineitem_discount->blocks[i])\n"
-    "      },\n"
-    "      f->blocks[i]);\n"
-    "    lineitem_extendedprice->deleteBlock(i);\n"
-    "    lineitem_discount->deleteBlock(i);\n"
-    "\n"
-    "    g->blocks[i] = new engine::FilteredDecimalVectorBlock();\n"
-    "    krao(*(e->blocks[i]), *(f->blocks[i]), g->blocks[i]);\n"
-    "    e->deleteBlock(i);\n"
-    "    f->deleteBlock(i);\n"
-    "\n"
-    "    sum(*g->blocks[i], h);\n"
-    "    g->deleteBlock(i);\n"
-    "  }\n"
-    "\n"
-    "  delete a_pred;\n"
-    "\n"
-    "  std::cout << (*h) << std::endl;\n"
-    "\n"
-    "  delete h;\n"
-    "\n"
-    "  auto end = std::chrono::high_resolution_clock::now();\n"
-    "  std::cout\n"
-    "    << \"Completed in \"\n"
-    "    << std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count()\n"
-    "    << \" ns\"\n"
-    "    << std::endl;\n"
-    "\n"
-    "  return 0;\n"
-    "}\n"
-  );
+  std::cout << d.toCpp(db) << std::endl;
+
+  std::ifstream ifs("queries/cpp/6.cpp");
+  std::string q6( (std::istreambuf_iterator<char>(ifs) ),
+                  (std::istreambuf_iterator<char>()    ) );
+
+  ASSERT_EQ(d.toCpp(db), q6);
 }
+
+
+TEST(toCpp, q14) {
+  laq::driver d;
+  engine::Database db("data/la", "TPCH_1", false);
+  ASSERT_TRUE(db.load());
+  ASSERT_FALSE(d.parse("queries/laq/14.laq"));
+
+  std::ifstream ifs("queries/cpp/14.cpp");
+  std::string q14( (std::istreambuf_iterator<char>(ifs) ),
+                  (std::istreambuf_iterator<char>()    ) );
+  ASSERT_EQ(d.toCpp(db), q14);
+}
+
+TEST(toCpp, q3) {
+  laq::driver d;
+  engine::Database db("data/la", "TPCH_1", false);
+  ASSERT_TRUE(db.load());
+  ASSERT_FALSE(d.parse("queries/laq/3.laq"));
+
+  std::ifstream ifs("queries/cpp/3.cpp");
+  std::string q3( (std::istreambuf_iterator<char>(ifs) ),
+                  (std::istreambuf_iterator<char>()    ) );
+  ASSERT_EQ(d.toCpp(db), q3);
+}
+
 
 int
 main(int argc, char **argv) {

@@ -3,37 +3,32 @@
  *
  * This query was automatically generated
  */
-#include <iostream>
-#include <vector>
 #include <chrono>
+#include <iostream>
+#include <string>
+#include <vector>
 #include "include/block.hpp"
 #include "include/database.hpp"
 #include "include/dot.hpp"
 #include "include/filter.hpp"
 #include "include/fold.hpp"
+#include "include/functions.hpp"
 #include "include/krao.hpp"
 #include "include/lift.hpp"
 #include "include/matrix.hpp"
 #include "include/types.hpp"
 
-#ifndef DATASET
-  #define DATASET "1"
-#endif
-
-inline bool filter_a(std::vector<engine::Literal> args) {
-  return args[0] >= "1994-01-01" && args[0] < "1995-01-01";
+inline bool filter_var_a(std::vector<engine::Literal> args){
+  return args[0]>="1994-01-01"&&args[0]<"1995-01-01";
 }
-
-inline bool filter_b(std::vector<engine::Decimal> args) {
-  return args[0] >= 0.05 && args[0] <= 0.07;
+inline bool filter_var_b(std::vector<engine::Decimal> args){
+  return args[0]>=0.05&&args[0]<=0.07;
 }
-
-inline bool filter_c(std::vector<engine::Decimal> args) {
-  return args[0] < 24;
+inline bool filter_var_d(std::vector<engine::Decimal> args){
+  return args[0]<24;
 }
-
-inline engine::Decimal lift_f(std::vector<engine::Decimal> args) {
-  return args[0] * args[1];
+inline engine::Decimal lift_var_f(std::vector<engine::Decimal> args) {
+  return args[0]*args[1];
 }
 
 int main() {
@@ -41,125 +36,124 @@ int main() {
 
   engine::Database db(
     "data/la",
-    std::string("TPCH_") + DATASET,
+    "TPCH_1",
     false);
 
-  engine::Bitmap *lineitem_shipdate =
+  engine::Bitmap *var_lineitem_shipdate =
     new engine::Bitmap(db.data_path,
-                       db.database_name,
-                       "lineitem",
-                       "shipdate");
-  engine::DecimalVector *lineitem_discount =
+      db.database_name,
+      "lineitem",
+      "shipdate");
+  engine::DecimalVector *var_lineitem_discount =
     new engine::DecimalVector(db.data_path,
-                              db.database_name,
-                              "lineitem",
-                              "discount");
-  engine::DecimalVector *lineitem_quantity =
+      db.database_name,
+      "lineitem",
+      "discount");
+  engine::DecimalVector *var_lineitem_quantity =
     new engine::DecimalVector(db.data_path,
-                              db.database_name,
-                              "lineitem",
-                              "quantity");
-  engine::DecimalVector *lineitem_extendedprice =
+      db.database_name,
+      "lineitem",
+      "quantity");
+  engine::DecimalVector *var_lineitem_extendedprice =
     new engine::DecimalVector(db.data_path,
-                              db.database_name,
-                              "lineitem",
-                              "extendedprice");
+      db.database_name,
+      "lineitem",
+      "extendedprice");
 
-  engine::FilteredBitVector *a_pred =
-    new engine::FilteredBitVector(lineitem_shipdate->nLabelBlocks);
-  engine::FilteredBitVector *a =
-    new engine::FilteredBitVector(lineitem_shipdate->nBlocks);
-  engine::FilteredBitVector *b =
-    new engine::FilteredBitVector(lineitem_discount->nBlocks);
-  engine::FilteredBitVector *c =
-    new engine::FilteredBitVector(lineitem_quantity->nBlocks);
-  engine::FilteredBitVector *d =
-    new engine::FilteredBitVector(a->nBlocks);
-  engine::FilteredBitVector *e =
-    new engine::FilteredBitVector(c->nBlocks);
-  engine::DecimalVector *f =
-    new engine::DecimalVector(lineitem_extendedprice->nBlocks);
-  engine::FilteredDecimalVector *g =
-    new engine::FilteredDecimalVector(e->nBlocks);
-  engine::Decimal *h =
+  engine::FilteredBitVector *var_a_pred =
+    new engine::FilteredBitVector(var_lineitem_shipdate->nLabelBlocks);
+  engine::FilteredBitVector *var_a =
+    new engine::FilteredBitVector(var_lineitem_shipdate->nBlocks);
+  engine::FilteredBitVector *var_b =
+    new engine::FilteredBitVector(var_lineitem_discount->nBlocks);
+  engine::FilteredBitVector *var_c =
+    new engine::FilteredBitVector(var_a->nBlocks);
+  engine::FilteredBitVector *var_d =
+    new engine::FilteredBitVector(var_lineitem_quantity->nBlocks);
+  engine::FilteredBitVector *var_e =
+    new engine::FilteredBitVector(var_c->nBlocks);
+  engine::DecimalVector *var_f =
+    new engine::DecimalVector(var_lineitem_extendedprice->nBlocks);
+  engine::FilteredDecimalVector *var_g =
+    new engine::FilteredDecimalVector(var_e->nBlocks);
+  engine::Decimal *var_h =
     new engine::Decimal();
 
-  #pragma omp parallel for
-  for (engine::Size i = 0; i < lineitem_shipdate->nLabelBlocks; ++i) {
-    // A = filter( lineitem.shipdate >= "1994-01-01"
-    //             AND lineitem.shipdate < "1995-01-01" )
-    lineitem_shipdate->loadLabelBlock(i);
-    a_pred->blocks[i] = new engine::FilteredBitVectorBlock();
-    filter(filter_a, {*(lineitem_shipdate->labels[i])}, a_pred->blocks[i]);
-    lineitem_shipdate->deleteLabelBlock(i);
+  for (engine::Size i = 0; i < var_lineitem_shipdate->nLabelBlocks; ++i) {
+    var_lineitem_shipdate->loadLabelBlock(i);
+    var_a_pred->blocks[i] = new engine::FilteredBitVectorBlock();
+    filter(filter_var_a,
+      {
+        *(var_lineitem_shipdate->labels[i])
+      },
+      var_a_pred->blocks[i]);
+    var_lineitem_shipdate->deleteLabelBlock(i);
   }
 
-  #pragma omp parallel for
-  for (engine::Size i = 0; i < lineitem_shipdate->nBlocks; ++i) {
-    // A = filter( lineitem.shipdate >= "1994-01-01"
-    //             AND lineitem.shipdate < "1995-01-01" )
-    lineitem_shipdate->loadBlock(i);
-    a->blocks[i] = new engine::FilteredBitVectorBlock();
-    dot(*a_pred, *(lineitem_shipdate->blocks[i]), a->blocks[i]);
-    lineitem_shipdate->deleteBlock(i);
+  for(engine::Size i = 0; i < var_lineitem_shipdate->nBlocks; ++i) {
+    var_lineitem_shipdate->loadBlock(i);
+    var_a->blocks[i] = new engine::FilteredBitVectorBlock();
+    dot(*var_a_pred, *(var_lineitem_shipdate->blocks[i]), var_a->blocks[i]);
+    var_lineitem_shipdate->deleteBlock(i);
+    var_lineitem_discount->loadBlock(i);
+    var_b->blocks[i] = new engine::FilteredBitVectorBlock();
+    filter(filter_var_b,
+      {
+        *(var_lineitem_discount->blocks[i])
+      },
+      var_b->blocks[i]);
 
-    // B = filter( lineitem.discount >= 0.05 AND lineitem.discount <= 0.07 )
-    lineitem_discount->loadBlock(i);
-    b->blocks[i] = new engine::FilteredBitVectorBlock();
-    filter(filter_b, {*(lineitem_discount->blocks[i])}, b->blocks[i]);
+    var_c->blocks[i] = new engine::FilteredBitVectorBlock();
+    krao(*(var_a->blocks[i]), *(var_b->blocks[i]), var_c->blocks[i]);
+    var_a->deleteBlock(i);
+    var_b->deleteBlock(i);
 
-    // C = filter( lineitem.quantity < 24 )
-    lineitem_quantity->loadBlock(i);
-    c->blocks[i] = new engine::FilteredBitVectorBlock();
-    filter(filter_c,
-      {*(lineitem_quantity->blocks[i])},
-      c->blocks[i]);
-    lineitem_quantity->deleteBlock(i);
+    var_lineitem_quantity->loadBlock(i);
+    var_d->blocks[i] = new engine::FilteredBitVectorBlock();
+    filter(filter_var_d,
+      {
+        *(var_lineitem_quantity->blocks[i])
+      },
+      var_d->blocks[i]);
+    var_lineitem_quantity->deleteBlock(i);
 
-    // D = hadamard( A, B )
-    d->blocks[i] = new engine::FilteredBitVectorBlock();
-    krao(*(a->blocks[i]), *(b->blocks[i]), d->blocks[i]);
-    a->deleteBlock(i);
-    b->deleteBlock(i);
+    var_e->blocks[i] = new engine::FilteredBitVectorBlock();
+    krao(*(var_c->blocks[i]), *(var_d->blocks[i]), var_e->blocks[i]);
+    var_c->deleteBlock(i);
+    var_d->deleteBlock(i);
 
-    // E = hadamard( C, D )
-    e->blocks[i] = new engine::FilteredBitVectorBlock();
-    krao(*(c->blocks[i]), *(d->blocks[i]), e->blocks[i]);
-    c->deleteBlock(i);
-    d->deleteBlock(i);
+    var_lineitem_extendedprice->loadBlock(i);
+    var_f->blocks[i] = new engine::DecimalVectorBlock();
+    lift(lift_var_f,
+      {
+        *(var_lineitem_extendedprice->blocks[i]),
+        *(var_lineitem_discount->blocks[i])
+      },
+      var_f->blocks[i]);
+    var_lineitem_extendedprice->deleteBlock(i);
+    var_lineitem_discount->deleteBlock(i);
 
-    // F = lift( lineitem.extendedprice * lineitem.discount )
-    lineitem_extendedprice->loadBlock(i);
-    f->blocks[i] = new engine::DecimalVectorBlock();
-    lift(lift_f, {
-      *(lineitem_discount->blocks[i]),
-      *(lineitem_extendedprice->blocks[i])},
-      f->blocks[i]);
-    lineitem_extendedprice->deleteBlock(i);
-    lineitem_discount->deleteBlock(i);
+    var_g->blocks[i] = new engine::FilteredDecimalVectorBlock();
+    krao(*(var_e->blocks[i]), *(var_f->blocks[i]), var_g->blocks[i]);
+    var_e->deleteBlock(i);
+    var_f->deleteBlock(i);
 
-    // G = hadamard( E, F )
-    g->blocks[i] = new engine::FilteredDecimalVectorBlock();
-    krao(*(e->blocks[i]), *(f->blocks[i]), g->blocks[i]);
-    e->deleteBlock(i);
-    f->deleteBlock(i);
-
-    // H = sum( G )
-    #pragma omp critical
-    {
-      sum(*(g->blocks[i]), h);
-    }
-    g->deleteBlock(i);
+    sum(*var_g->blocks[i], var_h);
+    var_g->deleteBlock(i);
   }
 
-  delete a_pred;
+  delete var_a_pred;
 
-  std::cout << (*h) << std::endl;
+  std::cout << (*var_h) << std::endl;
 
-  delete h;
+  delete var_h;
 
   auto end = std::chrono::high_resolution_clock::now();
-  std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count() << std::endl;
+  std::cout
+    << "Completed in "
+    << std::chrono::duration_cast<std::chrono::nanoseconds>(end-start).count()
+    << " ns"
+    << std::endl;
 
   return 0;
 }

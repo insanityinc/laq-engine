@@ -31,7 +31,26 @@ int main() {
 
   // check if table exists, if not create it
   // else return table exists
+  db.createTable("customer", {
+    {"custkey", {"dimension", "customer", "custkey"} },
+    {"mktsegment", {"dimension", "customer", "mktsegment"}}
+  });
+
+  db.createTable("part", {
+    {"partkey", {"dimension", "part", "partkey"} },
+    {"type", {"dimension", "part", "type"}}
+  });
+
+  db.createTable("orders", {
+    {"orderkey", {"dimension", "orders", "orderkey"} },
+    {"custkey", {"dimension", "customer", "custkey"} },
+    {"orderdate", {"dimension", "orders", "orderdate"} },
+    {"shippriority", {"dimension", "orders", "shippriority"} }
+  });
+
   db.createTable("lineitem", {
+    {"orderkey", {"dimension", "orders", "orderkey"} },
+    {"partkey", {"dimension", "part", "partkey"} },
     {"quantity", {"measure"} },
     {"extendedprice", {"measure"} },
     {"discount", {"measure"} },
@@ -41,9 +60,37 @@ int main() {
   // copy from "path" to "table" {file column, "attribute"},
   // separating by "delimiter"
 
+  db.copyFrom(std::string(DBGEN_DATA_PATH) + "/" + std::string(DATASET) + "/customer.tbl",
+    "customer",
+    {
+      {0, "custkey"},
+      {6, "mktsegment"}
+    },
+    '|');
+
+  db.copyFrom(std::string(DBGEN_DATA_PATH) + "/" + std::string(DATASET) + "/part.tbl",
+    "part",
+    {
+      {0, "partkey"},
+      {4, "type"}
+    },
+    '|');
+
+  db.copyFrom(std::string(DBGEN_DATA_PATH) + "/" + std::string(DATASET) + "/orders.tbl",
+    "orders",
+    {
+      {0, "orderkey"},
+      {1, "custkey"},
+      {4, "orderdate"},
+      {7, "shippriority"}
+    },
+    '|');
+
   db.copyFrom(std::string(DBGEN_DATA_PATH) + "/" + std::string(DATASET) + "/lineitem.tbl",
     "lineitem",
     {
+      {0, "orderkey"},
+      {1, "partkey"},
       {4, "quantity"},
       {5, "extendedprice"},
       {6, "discount"},

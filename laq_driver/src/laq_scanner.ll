@@ -24,7 +24,7 @@
 %option noyywrap nounput batch debug
 
 blank                   [ \t\r]+
-symbols                 [=,&<>+/%~\(\)\|\^\-\*\.]
+symbols                 [,&<>+/%~\(\)\|\^\-\*\.]
 
 filter                  [fF][iI][lL][tT][eE][rR]
 lift                    [lL][iI][fF][tT]
@@ -73,85 +73,87 @@ not                     ([nN][oO][tT]|!)
   void toLower(std::string& str);
 %}
 
-<INITIAL>{blank}            { yylloc->step(); }
-<INITIAL>[\n]+              { yylloc->lines( yyleng );
-                              yylloc->step();
-                            }
-<INITIAL>"//".+             { }
-<INITIAL>"/*"               { BEGIN MLCOMMENT; }
-<INITIAL>{symbols}          { return yy::laq_parser::token_type( yytext[0] ); }
+<INITIAL>{blank}               { yylloc->step(); }
+<INITIAL>[\n]+                 { yylloc->lines( yyleng );
+                                 yylloc->step();
+                               }
+<INITIAL>"//".+                { }
+<INITIAL>"/*"                  { BEGIN MLCOMMENT; }
+<INITIAL>{symbols}             { return yy::laq_parser::token_type( yytext[0] ); }
 
-<INITIAL>{filter}           { return token::FILTER; }
-<INITIAL>{lift}              { return token::LIFT; }
-<INITIAL>{dot}              { return token::DOT; }
-<INITIAL>{krao}             { return token::KRAO; }
-<INITIAL>{hadamard}         { return token::HADAMARD; }
+<INITIAL>{filter}              { return token::FILTER; }
+<INITIAL>{lift}                { return token::LIFT; }
+<INITIAL>{dot}                 { return token::DOT; }
+<INITIAL>{krao}                { return token::KRAO; }
+<INITIAL>{hadamard}            { return token::HADAMARD; }
 
-<INITIAL>{count}            { return token::COUNT; }
-<INITIAL>{sum}              { return token::SUM; }
-<INITIAL>{avg}              { return token::AVG; }
-<INITIAL>{min}              { return token::MIN; }
-<INITIAL>{max}              { return token::MAX; }
+<INITIAL>{count}               { return token::COUNT; }
+<INITIAL>{sum}                 { return token::SUM; }
+<INITIAL>{avg}                 { return token::AVG; }
+<INITIAL>{min}                 { return token::MIN; }
+<INITIAL>{max}                 { return token::MAX; }
 
-<INITIAL>{power}            { return token::POWER; }
-<INITIAL>{exp}              { return token::EXP; }
-<INITIAL>{sqrt}             { return token::SQRT; }
+<INITIAL>{power}               { return token::POWER; }
+<INITIAL>{exp}                 { return token::EXP; }
+<INITIAL>{sqrt}                { return token::SQRT; }
 
-<INITIAL>{int}              { yylval->sval = new std::string( yytext );
-                              return token::INT;
-                            }
-<INITIAL>{float}            { yylval->sval = new std::string( yytext );
-                              return token::FLOAT;
-                            }
-<INITIAL>{date}             { yylval->sval = new std::string( yytext );
-                              return token::DATE;
-                            }
+<INITIAL>{int}                 { yylval->sval = new std::string( yytext );
+                                 return token::INT;
+                               }
+<INITIAL>{float}               { yylval->sval = new std::string( yytext );
+                                 return token::FLOAT;
+                               }
+<INITIAL>{date}                { yylval->sval = new std::string( yytext );
+                                 return token::DATE;
+                               }
 
-<INITIAL>{or}               { return token::OR; }
-<INITIAL>{and}              { return token::AND; }
-<INITIAL>{eq}               { return token::EQ; }
-<INITIAL>{ne}               { return token::NE; }
-<INITIAL>{le}               { return token::LE; }
-<INITIAL>{ge}               { return token::GE; }
-<INITIAL>{match}            { BEGIN REGEXPRESSION;
-                              return token::MATCH;
-                            }
-<INITIAL>{left}             { return token::LEFT; }
-<INITIAL>{right}            { return token::RIGHT; }
-<INITIAL>{not}              { return token::NOT; }
+<INITIAL>{or}                  { return token::OR; }
+<INITIAL>{and}                 { return token::AND; }
+<INITIAL>{le}                  { return token::LE; }
+<INITIAL>{ge}                  { return token::GE; }
+<INITIAL>{eq}                  { return token::EQ; }
+<INITIAL>{ne}                  { return token::NE; }
 
-<INITIAL>{string}           { yylval->sval = new std::string( yytext );
-                              return token::STRING;
-                            }
-<INITIAL>"return"           { yylval->sval = new std::string( yytext );
-                              return token::RETURN;
-                            }
-<INITIAL>{identifier}       { yylval->sval = new std::string( yytext );
-                              toLower( *(yylval->sval) );
-                              return token::IDENTIFIER;
-                            }
-<INITIAL>.                  { driver->error (*yylloc, "Invalid character " + std::string( yytext ) ); }
+<INITIAL>{match}               { BEGIN REGEXPRESSION;
+                                 return token::MATCH;
+                               }
+<INITIAL>{left}                { return token::LEFT; }
+<INITIAL>{right}               { return token::RIGHT; }
+<INITIAL>{not}                 { return token::NOT; }
 
-<MLCOMMENT>"*/"             { BEGIN INITIAL; }
-<MLCOMMENT>.                { }
-<MLCOMMENT>[\n]+            { yylloc->lines( yyleng );
-                              yylloc->step();
-                            }
+<INITIAL>{string}              { yylval->sval = new std::string( yytext );
+                                 return token::STRING;
+                               }
+<INITIAL>"return"              { yylval->sval = new std::string( yytext );
+                                 return token::RETURN;
+                               }
+<INITIAL>{identifier}          { yylval->sval = new std::string( yytext );
+                                 toLower( *(yylval->sval) );
+                                 return token::IDENTIFIER;
+                               }
+<INITIAL>.                     { driver->error (*yylloc, "Invalid character " + std::string( yytext ) ); }
 
-<REGEXPRESSION>{blank}      { yylloc->step(); }
-<REGEXPRESSION>[\n]+        { yylloc->lines( yyleng );
-                              yylloc->step();
-                            }
-<REGEXPRESSION>{identifier} { yylval->sval = new std::string( yytext );
-                              toLower( *(yylval->sval) );
-                              return token::IDENTIFIER;
-                            }
-<REGEXPRESSION>{symbols}    { return yy::laq_parser::token_type( yytext[0] ); }
-<REGEXPRESSION>{string}     { yylval->sval = new std::string( yytext );
-                              BEGIN INITIAL;
-                              return token::REGEXP;
-                            }
-<REGEXPRESSION>.            { driver->error(*yylloc, "Invalid character " + std::string(yytext) + " on regular expression"); }
+<MLCOMMENT>"*/"                { BEGIN INITIAL; }
+<MLCOMMENT>.                   { }
+<MLCOMMENT>[\n]+               { yylloc->lines( yyleng );
+                                 yylloc->step();
+                               }
+
+<REGEXPRESSION>{blank}         { yylloc->step(); }
+<REGEXPRESSION>[\n]+           { yylloc->lines( yyleng );
+                                 yylloc->step();
+                               }
+<REGEXPRESSION>{identifier}    { yylval->sval = new std::string( yytext );
+                                 toLower( *(yylval->sval) );
+                                 return token::IDENTIFIER;
+                               }
+<REGEXPRESSION>("="|{symbols}) { return yy::laq_parser::token_type( yytext[0] ); }
+
+<REGEXPRESSION>{string}        { yylval->sval = new std::string( yytext );
+                                 BEGIN INITIAL;
+                                 return token::REGEXP;
+                               }
+<REGEXPRESSION>.               { driver->error(*yylloc, "Invalid character " + std::string(yytext) + " on regular expression"); }
 
 %%
 

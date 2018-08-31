@@ -15,7 +15,7 @@ driver::driver() : trace_scanning(false), trace_parsing(false) {
 }
 
 driver::~driver() {
-  // delete laquery;
+  //delete laquery;
 }
 
 int

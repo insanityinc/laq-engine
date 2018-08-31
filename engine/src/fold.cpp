@@ -24,8 +24,6 @@ void sum(const FilteredDecimalMapBlock& in,
   }
 
   /*
-  this is the part of getMatrix()
-
   void getMatrix(FilteredDecimalMapAcc& acc, FilteredDecimalMap *mat) {
     Size nnz = 0;
     for (const auto& kv : acc.map) {

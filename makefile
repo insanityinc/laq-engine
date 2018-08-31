@@ -1,21 +1,14 @@
 CXX = g++
 #/usr/lib/llvm-6.0/bin/clang++
+
 CXX_TMP_FLAGS = -O2 -std=c++11 -Wall -Wextra -Wshadow -Wconversion -pedantic -fopenmp
 #-Werror
 
 
-ifdef DATASET
-ifdef BSIZE
-CXXFLAGS = $(CXX_TMP_FLAGS) -DDATASET=\"$(DATASET)\" -DBSIZE=$(BSIZE)
-else
-CXXFLAGS = $(CXX_TMP_FLAGS) -DDATASET=\"$(DATASET)\"
-endif
-else
 ifdef BSIZE
 CXXFLAGS = $(CXX_TMP_FLAGS) -DBSIZE=$(BSIZE)
 else
 CXXFLAGS = $(CXX_TMP_FLAGS)
-endif
 endif
 
 LAQ_DIR = laq_driver

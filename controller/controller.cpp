@@ -125,7 +125,7 @@ int query(const std::string& in, const std::string& out) {
         if (laqToCpp(in, cpp)) {
           return 2;
         }
-      } else if (laqToCpp(out + "tmp.laq", cpp)) {
+      } else if (laqToCpp(out + ".tmp.laq", cpp)) {
         return 3;
       }
       if (outputType == CPP) {

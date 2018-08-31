@@ -19,13 +19,13 @@
 #include "include/types.hpp"
 
 inline bool filter_var_a(std::vector<engine::Literal> args){
-  return args[0]=="MACHINERY";
+  return args[0]=="BUILDING";
 }
 inline bool filter_var_c(std::vector<engine::Literal> args){
-  return args[0]<"1995-03-10";
+  return args[0]<"1995-03-15";
 }
 inline bool filter_var_h(std::vector<engine::Literal> args){
-  return args[0]>"1995-03-10";
+  return args[0]>"1995-03-15";
 }
 inline engine::Decimal lift_var_k(std::vector<engine::Decimal> args) {
   return args[0]*(1-args[1]);
@@ -277,6 +277,10 @@ int main() {
   std::cout << "L:\t\t" << L_nnz << std::endl;
 
   //(*var_m) = var_m_acc->getMatrix();
+
+  for(auto& x : var_m_acc->map) {
+    std::cout << x.second << std::endl;
+  }
 
   delete var_m_acc;
 

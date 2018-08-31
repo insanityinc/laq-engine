@@ -53,7 +53,7 @@ void krao(const FilteredDecimalVectorBlock& A,
     for (i = 0; i < A.cols.size() - 1; ++i) {
       C->cols[i] = nnz;
       if ( (A.cols[i+1] > A.cols[i]) && (B.cols[i+1] > B.cols[i]) ) {
-        C->values[nnz] = A.values[A.cols[i+1]];
+        C->values[nnz] = A.values[A.cols[i]];
         ++nnz;
       }
     }
@@ -61,7 +61,7 @@ void krao(const FilteredDecimalVectorBlock& A,
     for (i = 0; i < A.cols.size() - 1; ++i) {
       C->cols[i] = nnz;
       if ( (B.cols[i+1] > B.cols[i]) && (A.cols[i+1] > A.cols[i]) ) {
-        C->values[nnz] = A.values[A.cols[i+1]];
+        C->values[nnz] = A.values[A.cols[i]];
         ++nnz;
       }
     }
@@ -92,7 +92,7 @@ void krao(const FilteredBitmapBlock& A,
   Size i, nnz = 0;
   for (i = 0; i < A.cols.size() - 1; ++i) {
     if ( A.cols[i+1] > A.cols[i] ) {
-      C->rows[nnz] = (A.rows[A.cols[i+1]] * Bnrows) + B.rows[i];
+      C->rows[nnz] = (A.rows[A.cols[i]] * Bnrows) + B.rows[i];
       ++nnz;
     }
   }
@@ -107,7 +107,7 @@ void krao(const BitmapBlock& A,
   Size i, nnz = 0;
   for (i = 0; i < B.cols.size() - 1; ++i) {
     if ( B.cols[i+1] > B.cols[i] ) {
-      C->rows[nnz] = (A.rows[i] * Bnrows) + B.rows[B.cols[i+1]];
+      C->rows[nnz] = (A.rows[i] * Bnrows) + B.rows[B.cols[i]];
       ++nnz;
     }
   }
@@ -124,7 +124,7 @@ void krao(const FilteredBitmapBlock& A,
     for (i = 0; i < A.cols.size() - 1; ++i) {
       C->cols[i] = nnz;
       if ( (A.cols[i+1] > A.cols[i]) && (B.cols[i+1] > B.cols[i]) ) {
-        C->rows[nnz] = A.rows[A.cols[i+1]];
+        C->rows[nnz] = A.rows[A.cols[i]];
         ++nnz;
       }
     }
@@ -132,7 +132,7 @@ void krao(const FilteredBitmapBlock& A,
     for (i = 0; i < A.cols.size() - 1; ++i) {
       C->cols[i] = nnz;
       if ( (B.cols[i+1] > B.cols[i]) && (A.cols[i+1] > A.cols[i]) ) {
-        C->rows[nnz] = A.rows[A.cols[i+1]];
+        C->rows[nnz] = A.rows[A.cols[i]];
         ++nnz;
       }
     }

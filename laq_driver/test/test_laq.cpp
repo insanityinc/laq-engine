@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights reserved.
+ * Copyright (c) 2018 João Afonso. All rights reserved.
  *
  * Unit tests for LAQ parser
  */

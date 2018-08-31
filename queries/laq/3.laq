@@ -1,14 +1,15 @@
-A = filter( customer.mktsegment == "MACHINERY" )
-B = dot( A, orders.custkey )
-C = filter( orders.orderdate < "1995-03-10" )
-D = hadamard( B, C )
-E = krao( D, orders.orderdate )
-F = krao( E, orders.shippriority )
-G = dot( F, lineitem.orderkey )
-H = filter( lineitem.shipdate > "1995-03-10" )
-I = krao( G, H )
-J = krao( lineitem.orderkey, I )
-K = lift( lineitem.extendedprice * (1 - lineitem.discount) )
-L = krao( J, K )
-M = sum( L )
+A = filter( customer.mktsegment == "MACHINERY" )            // #c -> 1
+B = dot( A, orders.custkey )                                // #o -> 1
+C = filter( orders.orderdate < "1995-03-10" )               // #o -> 1
+D = hadamard( B, C )                                        // #o -> 1
+E = krao( D, orders.orderdate )                             // #o -> D
+F = krao( E, orders.shippriority )                          // #o -> DxP
+G = dot( F, lineitem.orderkey )                             // #l -> DxP
+H = filter( lineitem.shipdate > "1995-03-10" )              // #l -> 1
+I = krao( G, H )                                            // #l -> DxP
+J = krao( lineitem.orderkey, I )                            // #l -> KxDxP
+K = lift( lineitem.extendedprice * (1 - lineitem.discount) )// #l -> 1
+L = krao( J, K )                                            // #l -> KxDxP
+M = sum( L )                                                // 1  -> KxDxP
 return( M )
+// return( l_orderkey, M, o_orderdate, o_shippriority )

@@ -1,8 +1,6 @@
 /*
  * Copyright (c) 2018 João Afonso. All rights reserved.
  */
-#include <string>
-#include <vector>
 #include "src/laq_statement.hpp"
 
 namespace laq {

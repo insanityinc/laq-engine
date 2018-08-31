@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 João Afonso. All rights reserved.
+ * Copyright (c) 2018 João Afonso. All rights reserved.
  */
 #ifndef LAQ_DRIVER_INCLUDE_LAQ_DRIVER_H_
 #define LAQ_DRIVER_INCLUDE_LAQ_DRIVER_H_

@@ -95,7 +95,7 @@ Give an example
 ### Run queries
 
 ```
-engine/bin/loag
+engine/bin/load
 engine/bin/q6
 ```
 

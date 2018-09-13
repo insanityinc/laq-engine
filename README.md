@@ -24,6 +24,8 @@ cd dbms/lib
 git clone https://github.com/USCiLab/cereal.git
 ```
 
+Download dbgen for the TPC-H benchmark and create the desired datasets
+
 [Optional] Google test used for unit testing, use your C++ compiler
 
 ```
@@ -66,6 +68,8 @@ until finished
 
 <!--Explain what these tests test and why-->
 
+Note: some tests implemented just for debug, some queries FAIL the tests
+
 ```
 cd dbms
 make test
@@ -87,6 +91,13 @@ Give an example
 <!--## Deployment-->
 
 <!--Add additional notes about how to deploy this on a live system-->
+
+### Run queries
+
+```
+engine/bin/loag
+engine/bin/q6
+```
 
 ## Built With
 

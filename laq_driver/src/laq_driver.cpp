@@ -4,6 +4,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <algorithm>
 #include "include/database.hpp"
 #include "include/laq_driver.hpp"
 #include "src/parsing_tree.hpp"
